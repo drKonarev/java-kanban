@@ -7,7 +7,11 @@ public class TaskTracker {
     private HashMap<Integer, EpicTask> epics = new HashMap<>();
     int index = 0;
 
-
+enum Status{
+    NEW,
+    DONE,
+    IN_PROGRESS
+}
 
     public void add(Task task) {
         task.setId(++index);
@@ -15,12 +19,12 @@ public class TaskTracker {
 
     }
 
-    public void add(SubTask task, int epicId) {
+    public void add(SubTask task) {
         task.setId(++index);
-        subs.put(task.getId(), task);// положи эту задачу в мапу с сабами с айди
+        subs.put(task.getId(), task);
 
-        EpicTask epic = epics.get(epicId);
-        epic.addSubTask(task.getId()); //положи саб в эпик с айди, который мы указали
+        EpicTask epic = epics.get(task.getEpicId());
+        epic.addSubTask(task.getId());
 
         updateEpicStatus(epic);
     }
@@ -35,13 +39,11 @@ public class TaskTracker {
     }
 
     public void removeSub(Integer id) {
+        int epicId = subs.get(id).getEpicId();
+        EpicTask epic = epics.get(epicId);
+        epic.epicTasks.remove(id);
         subs.remove(id);
-        for (EpicTask epic : epics.values()) {
-            if (epic.epicTasks.contains(id)) {
-                epic.epicTasks.remove(id);
-                updateEpicStatus(epic);
-            }
-        }
+        updateEpicStatus(epic);
     }
 
     public void removeEpic(int id) {
@@ -60,11 +62,8 @@ public class TaskTracker {
     public void updateSub(SubTask sub, Integer id) {
         sub.setId(id);
         subs.put(id, sub);
-        for (EpicTask epic : epics.values()) {
-            if (epic.epicTasks.contains(id)) {
-                updateEpicStatus(epic);
-            }
-        }
+        EpicTask epic = epics.get(subs.get(id).getEpicId());
+        updateEpicStatus(epic);
     }
 
     private void updateEpicStatus(EpicTask epic) {
@@ -73,27 +72,25 @@ public class TaskTracker {
             SubTask sub = subs.get(subId);
             if (subs.get(subId) != null) {
                 actualStatus.add(sub.status);
-            } else {
-                continue;
             }
         }
-        if (!actualStatus.contains("NEW")) {
-            if (actualStatus.contains("IN_PROGRESS")) {
-                epic.setStatus("IN_PROGRESS");
+        if (!actualStatus.contains(Status.NEW)) {
+            if (actualStatus.contains(Status.IN_PROGRESS)) {
+                epic.setStatus(Status.IN_PROGRESS.toString());
             } else {
-                epic.setStatus("DONE");
+                epic.setStatus(Status.DONE.toString());
             }
         } else {
-            if (!actualStatus.contains("IN_PROGRESS") && !actualStatus.contains("DONE")) {
-                epic.setStatus("NEW");
+            if (!actualStatus.contains(Status.IN_PROGRESS) && !actualStatus.contains(Status.DONE)) {
+                epic.setStatus(Status.NEW.toString());
             } else {
-                epic.setStatus("IN_PROGRESS");
+                epic.setStatus(Status.IN_PROGRESS.toString());
             }
         }
     }
 
     public void showTasks (){
-        System.out.println(" Список задач : \n");
+        System.out.println("\n + Список задач : \n");
         for(Task task: tasks.values() ){
             System.out.println("#" + task.title);
         }
@@ -122,9 +119,9 @@ public class TaskTracker {
     }
 
     public void getAnyTask (int id){
-        if (epics.containsKey(id)) System.out.println(epics.get(id).toString());
-        if (subs.containsKey(id)) System.out.println(subs.get(id).toString());
-        if (tasks.containsKey(id)) System.out.println(tasks.get(id).toString());
+        if (epics.containsKey(id)) System.out.println('\n'+epics.get(id).toString());
+        if (subs.containsKey(id)) System.out.println('\n'+subs.get(id).toString());
+        if (tasks.containsKey(id)) System.out.println('\n'+tasks.get(id).toString());
 
     }
 }
