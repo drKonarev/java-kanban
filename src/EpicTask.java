@@ -2,19 +2,20 @@ import java.util.ArrayList;
 
 public class EpicTask extends Task {
 
-    protected ArrayList<Integer> epicTasks = new ArrayList<>();
+    protected ArrayList<Integer> subTasksList = new ArrayList<>();
 
     public EpicTask(String title, String description) {
-        super(title, description, "NEW");
+        super(title, description, Status.NEW);
+        id = ++TaskTracker.index;
     }
 
 
     public ArrayList<Integer> getSubTasks() {
-        return epicTasks;
+        return subTasksList;
     }
 
     public void addSubTask(int taskId) {
-        epicTasks.add(taskId);
+        subTasksList.add(taskId);
     }
 
 
@@ -26,8 +27,8 @@ public class EpicTask extends Task {
                 ", status '" + status + '\'' +
                 ", id '" + id + '\'';
 
-        if (!epicTasks.isEmpty()) { // проверяем, что поле не содержит null
-            result = result + ", sub tasks amount '" + epicTasks.size() + "' }"; // выводим не значение, а длину
+        if (!subTasksList.isEmpty()) { // проверяем, что поле не содержит null
+            result = result + ", sub tasks amount '" + subTasksList.size() + "' }"; // выводим не значение, а длину
         } else {
             result = result + ", sub tasks list is empty }; ";// выводим информацию, что поле равно null
         }

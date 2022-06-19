@@ -2,12 +2,14 @@ public class SubTask extends Task {
 
     protected int epicId;
 
-    public SubTask(String title, String description, String status, int epicId) {
+    public SubTask(String title, String description, Status status, int epicId) {
         super(title, description, status);
         this.epicId = epicId;
+        id = ++TaskTracker.index;
     }
 
-    public int getEpicId (){
+
+    public int getEpicId() {
         return epicId;
     }
 
@@ -17,9 +19,9 @@ public class SubTask extends Task {
 
 
     public String toString() {
-        return "Sub Task {" + // имя класса
-                "title '" + title + '\'' + // поле1=значение1
-                ", description '" + description + '\'' + // поле2=значение2
+        return "Sub Task {" +
+                "title '" + title + '\'' +
+                ", description '" + description + '\'' +
                 ", status '" + status + '\'' +
                 ", id '" + id + "' }";
     }

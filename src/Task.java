@@ -2,13 +2,23 @@ public class Task {
     protected String title;
     protected String description;
     protected int id;
-    protected String status;
+    protected Status status;
 
-    public Task (String title, String description,  String status) {
+    public enum Status {
+        NEW,
+        DONE,
+        IN_PROGRESS
+    }
+
+    public Task(String title, String description, Status newStatus) {
         this.title = title;
         this.description = description;
-        //this.id = id;
-        this.status = status;
+        this.status = newStatus;
+        id = ++TaskTracker.index;
+    }
+
+    public Status getStatus() {
+        return status;
     }
 
     public int getId() {
@@ -19,7 +29,7 @@ public class Task {
         this.id = id;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 
@@ -27,7 +37,8 @@ public class Task {
         return "Task {" +
                 "title '" + title + '\'' +
                 ", description '" + description + '\'' +
-                ", status '" + status +'\'' +
+                ", status '" + status + '\'' +
                 ", id '" + id + "' }";
     }
+
 }
