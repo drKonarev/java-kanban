@@ -5,7 +5,7 @@ public class SubTask extends Task {
     public SubTask(String title, String description, Status status, int epicId) {
         super(title, description, status);
         this.epicId = epicId;
-        id = ++TaskTracker.index;
+        id = ++InMemoryTaskManager.index;
     }
 
 

@@ -14,7 +14,7 @@ public class Task {
         this.title = title;
         this.description = description;
         this.status = newStatus;
-        id = ++TaskTracker.index;
+        id = ++InMemoryTaskManager.index;
     }
 
     public Status getStatus() {

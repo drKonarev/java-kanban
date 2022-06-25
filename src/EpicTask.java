@@ -6,7 +6,7 @@ public class EpicTask extends Task {
 
     public EpicTask(String title, String description) {
         super(title, description, Status.NEW);
-        id = ++TaskTracker.index;
+        id = ++InMemoryTaskManager.index;
     }
 
 
