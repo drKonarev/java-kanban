@@ -1,20 +1,26 @@
+import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class InMemoryTaskManager implements TaskTracker{
+public class InMemoryTaskManager implements TaskTracker {
     private HashMap<Integer, Task> tasks = new HashMap<>();
     private HashMap<Integer, SubTask> subs = new HashMap<>();
     private HashMap<Integer, EpicTask> epics = new HashMap<>();
     static int index = 0;
-@Override
+
+    HistoryManager historyManager = Managers.getDefaultHistory();
+
+    @Override
     public void addTask(Task task) {
-        if (task.getClass()==Task.class) {
+        if (task.getClass() == Task.class) {
             tasks.put((task.getId()), task);
+            historyManager.add(task);
         } else {
             System.out.println("Указан неверный тип для задачи.");
             return;
         }
     }
+
     @Override
     public void addSub(SubTask sub) {
         subs.put(sub.getId(), sub);
@@ -22,15 +28,19 @@ public class InMemoryTaskManager implements TaskTracker{
             EpicTask epic = epics.get(sub.getEpicId());
             epic.addSubTask(sub.getId());
             updateEpicStatus(epic);
+            historyManager.add(sub);
         } else {
             System.out.println(" Невозможно добавить подзадачу.");
         }
 
     }
+
     @Override
     public void addEpic(EpicTask epic) {
         epics.put(epic.getId(), epic);
+        historyManager.add(epic);
     }
+
     @Override
     public void removeTask(int id) {
         if (checkTaskExistence(id)) {
@@ -39,6 +49,7 @@ public class InMemoryTaskManager implements TaskTracker{
             System.out.println(" Невозможно удалить задачу.");
         }
     }
+
     @Override
     public void removeSub(Integer id) {
         if (checkSubExistence(id)) {
@@ -51,6 +62,7 @@ public class InMemoryTaskManager implements TaskTracker{
             System.out.println(" Невозможно удалить подзадачу.");
         }
     }
+
     @Override
     public void removeEpic(int id) {
         if (checkEpicExistence(id)) {
@@ -65,6 +77,7 @@ public class InMemoryTaskManager implements TaskTracker{
 
         }
     }
+
     @Override
     public void updateTask(Task task, int taskId) {
         if (task == null) {
@@ -78,6 +91,7 @@ public class InMemoryTaskManager implements TaskTracker{
         }
 
     }
+
     @Override
     public void updateSub(SubTask sub, Integer id) {
         if (sub == null) {
@@ -122,6 +136,7 @@ public class InMemoryTaskManager implements TaskTracker{
             }
         }
     }
+
     @Override
     public void showTasks() {
         System.out.println("\n + Список задач : \n");
@@ -137,6 +152,7 @@ public class InMemoryTaskManager implements TaskTracker{
             System.out.println("*" + subTask.title + " (id: " + subTask.id + ")");
         }
     }
+
     @Override
     public void totalRemove() {
         tasks.clear();
@@ -155,6 +171,7 @@ public class InMemoryTaskManager implements TaskTracker{
             System.out.println("Невозможно показать список подзадач эпик-задачи.");
         }
     }
+
     @Override
     public Task getTask(int id) {
         if (tasks.containsKey(id)) return tasks.get(id);
@@ -163,6 +180,7 @@ public class InMemoryTaskManager implements TaskTracker{
             return null;
         }
     }
+
     @Override
     public SubTask getSubTask(int id) {
         if (subs.containsKey(id)) return subs.get(id);
@@ -171,6 +189,7 @@ public class InMemoryTaskManager implements TaskTracker{
             return null;
         }
     }
+
     @Override
     public EpicTask getEpicTask(int id) {
         if (epics.containsKey(id)) return epics.get(id);
@@ -179,6 +198,7 @@ public class InMemoryTaskManager implements TaskTracker{
             return null;
         }
     }
+
     @Override
     public boolean checkTaskExistence(int taskId) {
         for (Task task : tasks.values()) {
@@ -191,6 +211,7 @@ public class InMemoryTaskManager implements TaskTracker{
         }
         return false;
     }
+
     @Override
     public boolean checkEpicExistence(int epicId) {
         for (EpicTask epic : epics.values()) {
@@ -202,6 +223,7 @@ public class InMemoryTaskManager implements TaskTracker{
         System.out.println("\n Эпик-задачи с таким id (" + epicId + ") нет!");
         return false;
     }
+
     @Override
     public boolean checkSubExistence(int subId) {
         for (SubTask sub : subs.values()) {

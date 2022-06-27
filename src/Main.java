@@ -17,7 +17,8 @@ public class Main {
         inMemoryTaskManager.addSub(sub1);
         inMemoryTaskManager.addSub(sub2);
         inMemoryTaskManager.addSub(sub3);
-
+        System.out.println(inMemoryTaskManager.historyManager.getHistory()); //проверка методов класса
+       // inMemoryTaskManager.historyManager.showHistory(); //проверка методов класса
         inMemoryTaskManager.showTasks();
         inMemoryTaskManager.showSubList(epic1.id);
 

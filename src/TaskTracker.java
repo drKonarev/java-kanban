@@ -1,4 +1,4 @@
-
+import java.util.List;
 
 public interface TaskTracker {
 
@@ -33,5 +33,11 @@ public interface TaskTracker {
     boolean checkEpicExistence(int epicId);
 
     boolean checkSubExistence(int subId);
+
+/*    List<Task> getHistory();
+
+    void add(Task task);
+
+    void showHistory();*/
 
 }
