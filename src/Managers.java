@@ -1,4 +1,4 @@
-public  class Managers <T>  {
+public  class Managers  {
 
     public static TaskTracker getDefault() {
         return  new InMemoryTaskManager();
