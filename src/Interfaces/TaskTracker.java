@@ -1,6 +1,15 @@
+package Interfaces;
+
+import Managers.InMemoryTaskManager;
 import Tasks.*;
 
 public interface TaskTracker {
+
+     enum Class{
+        TASK,
+        EPIC,
+        SUB
+    }
 
     void addTask(Task task);
 
@@ -8,17 +17,12 @@ public interface TaskTracker {
 
     void addEpic(EpicTask epic);
 
-    void removeTask(int id);
-
-    void removeSub(Integer id);
-
-    void removeEpic(int id);
 
     void updateTask(Task task, int taskId);
 
     void updateSub(SubTask sub, Integer id);
 
-    void showTasks();
+    void showTasks(Task task);
 
     void totalRemove();
 
@@ -28,16 +32,9 @@ public interface TaskTracker {
 
     EpicTask getEpicTask(int id);
 
-    boolean checkTaskExistence(int taskId);
 
-    boolean checkEpicExistence(int epicId);
 
-    boolean checkSubExistence(int subId);
+    Class checkExistence(int id);
 
-/*    List<Task> getHistory();
-
-    void add(Task task);
-
-    void showHistory();*/
 
 }

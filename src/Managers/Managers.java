@@ -1,5 +1,6 @@
-import Interfaces.HistoryManager;
-import Interfaces.TaskTracker;
+package Managers;
+
+import Interfaces.*;
 
 public  class Managers  {
 

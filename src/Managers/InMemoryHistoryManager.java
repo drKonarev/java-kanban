@@ -1,7 +1,9 @@
+package Managers;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import Interfaces.HistoryManager;
+import Interfaces.*;
 import Tasks.*;
 
 public class InMemoryHistoryManager implements HistoryManager {
@@ -9,8 +11,10 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void add(Task task) {
-        if(task ==null){return;}
-        if (story.size() <= 10) {
+        if (task == null) {
+            return;
+        }
+        if (story.size() < 10) {
             story.add(0, task);
         } else {
             story.remove(story.size() - 1);
@@ -22,13 +26,6 @@ public class InMemoryHistoryManager implements HistoryManager {
     public List<Task> getHistory() {
         return story;
     }
-
-/*    public void showHistory() {
-        System.out.println("Вот список последних вызванных задач:");
-        for (Task task : story) {
-            System.out.println("- " + task.title + " | " + task.getClass().getSimpleName() + " | " + task.getId());
-        }
-    }*/
 
 
 }

@@ -1,3 +1,6 @@
+package Tasks;
+import Managers.InMemoryTaskManager;
+
 import java.util.ArrayList;
 
 public class EpicTask extends Task {
@@ -6,11 +9,15 @@ public class EpicTask extends Task {
 
     public EpicTask(String title, String description) {
         super(title, description, Status.NEW);
-        id = ++InMemoryTaskManager.index;
+        id = InMemoryTaskManager.getNewIndex();
     }
 
 
     public ArrayList<Integer> getSubTasks() {
+        return subTasksList;
+    }
+
+    public ArrayList<Integer> getSubTasksList() {
         return subTasksList;
     }
 

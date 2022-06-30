@@ -1,11 +1,15 @@
-public class SubTask extends Task {
+package Tasks;
+
+import Managers.InMemoryTaskManager;
+
+public class SubTask extends Tasks.Task {
 
     protected int epicId;
 
     public SubTask(String title, String description, Status status, int epicId) {
         super(title, description, status);
         this.epicId = epicId;
-        id = ++InMemoryTaskManager.index;
+        id = InMemoryTaskManager.getNewIndex();
     }
 
 
@@ -17,13 +21,14 @@ public class SubTask extends Task {
         return id;
     }
 
-
+@Override
     public String toString() {
-        return "Sub Task {" +
+        String result = "Sub Task {" +
                 "title '" + title + '\'' +
                 ", description '" + description + '\'' +
                 ", status '" + status + '\'' +
                 ", id '" + id + "' }";
+        return result;
     }
 
 }

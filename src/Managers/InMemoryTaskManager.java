@@ -1,17 +1,23 @@
+package Managers;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import Interfaces.HistoryManager;
-import Interfaces.TaskTracker;
+import Interfaces.*;
 import Tasks.*;
 
 public class InMemoryTaskManager implements TaskTracker {
     private HashMap<Integer, Task> tasks = new HashMap<>();
     private HashMap<Integer, SubTask> subs = new HashMap<>();
     private HashMap<Integer, EpicTask> epics = new HashMap<>();
-    public static  int index = 0;
+    public static int index = 1;
 
-    HistoryManager historyManager = Managers.getDefaultHistory();
+    public HistoryManager historyManager = Managers.getDefaultHistory();
+
+
+    public static int getNewIndex() {
+        return index++;
+    }
 
     @Override
     public void addTask(Task task) {
@@ -20,14 +26,13 @@ public class InMemoryTaskManager implements TaskTracker {
             historyManager.add(task);
         } else {
             System.out.println("Указан неверный тип для задачи.");
-            return;
         }
     }
 
     @Override
     public void addSub(SubTask sub) {
         subs.put(sub.getId(), sub);
-        if (checkEpicExistence(sub.getEpicId())) {
+        if (checkExistence(sub.getEpicId()) == Class.EPIC) {
             EpicTask epic = epics.get(sub.getEpicId());
             epic.addSubTask(sub.getId());
             updateEpicStatus(epic);
@@ -44,41 +49,30 @@ public class InMemoryTaskManager implements TaskTracker {
         historyManager.add(epic);
     }
 
-    @Override
-    public void removeTask(int id) {
-        if (checkTaskExistence(id)) {
-            tasks.remove(id);
-        } else {
-            System.out.println(" Невозможно удалить задачу.");
-        }
-    }
+    public void remove(int id) {
+        if (checkExistence(id) != null) {
+            switch (checkExistence(id)) {
+                case TASK:
+                    tasks.remove(id);
+                    break;
+                case SUB:
+                    int epicId = subs.get(id).getEpicId();
+                    EpicTask epic = epics.get(epicId);
+                    epic.getSubTasksList().remove(id);
+                    subs.remove(id);
+                    updateEpicStatus(epic);
+                    break;
+                case EPIC:
+                    epic = epics.get(id);
+                    epics.remove(id);
+                    for (int subId : epic.getSubTasks()) {
+                        subs.remove(subId);
+                    }
+                    break;
 
-    @Override
-    public void removeSub(Integer id) {
-        if (checkSubExistence(id)) {
-            int epicId = subs.get(id).getEpicId();
-            EpicTask epic = epics.get(epicId);
-            epic.subTasksList.remove(id);
-            subs.remove(id);
-            updateEpicStatus(epic);
-        } else {
-            System.out.println(" Невозможно удалить подзадачу.");
-        }
-    }
 
-    @Override
-    public void removeEpic(int id) {
-        if (checkEpicExistence(id)) {
-            EpicTask epic = epics.get(id);
-            epics.remove(id);
-
-            for (int subId : epic.getSubTasks()) {
-                subs.remove(subId);
             }
-        } else {
-            System.out.println(" Невозможно удалить эпик-задачу.");
-
-        }
+        } else System.out.println(" Невозможно задачу с указанным id. Проверьте id.");
     }
 
     @Override
@@ -87,10 +81,10 @@ public class InMemoryTaskManager implements TaskTracker {
             System.out.println(" Передаваемый объект пуст.");
             return;
         }
-        if (checkTaskExistence(taskId)) {
+        if (checkExistence(taskId) == Class.TASK) {
             tasks.put(taskId, task);
         } else {
-            System.out.println(" Невозможно обновить задачу.");
+            System.out.println(" Невозможно обновить задачу. Проверьте id.");
         }
 
     }
@@ -102,13 +96,13 @@ public class InMemoryTaskManager implements TaskTracker {
             System.out.println(" Передаваемый объект пуст.");
             return;
         }
-        if (checkSubExistence(id)) {
+        if (checkExistence(id) == Class.SUB) {
             sub.setId(id);
             subs.put(id, sub);
             EpicTask epic = epics.get(subs.get(id).getEpicId());
             updateEpicStatus(epic);
         } else {
-            System.out.println(" Невозможно обновить подзадачу.");
+            System.out.println(" Невозможно обновить подзадачу. Проверьте id.");
         }
     }
 
@@ -141,18 +135,28 @@ public class InMemoryTaskManager implements TaskTracker {
     }
 
     @Override
-    public void showTasks() {
-        System.out.println("\n + Список задач : \n");
-        for (Task task : tasks.values()) {
-            System.out.println("#" + task.title + " (id: " + task.id + ")");
-        }
-        System.out.println("\n Список эпик-задач :  \n");
-        for (EpicTask epicTask : epics.values()) {
-            System.out.println("$" + epicTask.title + " (id: " + epicTask.id + ")");
-        }
-        System.out.println("\n Список подзадач :  \n");
-        for (SubTask subTask : subs.values()) {
-            System.out.println("*" + subTask.title + " (id: " + subTask.id + ")");
+    public void showTasks(Task object) {
+        switch (object.getClass().getSimpleName()) {
+            case "Task":
+                System.out.println("\n + Список задач : \n");
+                for (Task task : tasks.values()) {
+                    System.out.println("#" + task.getTitle() + " (id: " + task.getId() + ")");
+                }
+                break;
+            case "EpicTask":
+                System.out.println("\n Список эпик-задач :  \n");
+                for (EpicTask epicTask : epics.values()) {
+                    System.out.println("$" + epicTask.getTitle() + " (id: " + epicTask.getId() + ")");
+                }
+                break;
+            case "SubTask":
+                System.out.println("\n Список подзадач :  \n");
+                for (SubTask subTask : subs.values()) {
+                    System.out.println("*" + subTask.getTitle() + " (id: " + subTask.getId() + ")");
+                }
+                break;
+
+
         }
     }
 
@@ -164,11 +168,11 @@ public class InMemoryTaskManager implements TaskTracker {
     }
 
     public void showSubList(int epicId) {
-        if (checkEpicExistence(epicId)) {
+        if (checkExistence(epicId) == Class.EPIC) {
             EpicTask epic = epics.get(epicId);
             System.out.println("\n Список всех подзадач указанного эпика: \n");
             for (int subId : epic.getSubTasks()) {
-                System.out.println(subs.get(subId).title + " (id: " + subId + ")");
+                System.out.println(subs.get(subId).getTitle() + " (id: " + subId + ")");
             }
         } else {
             System.out.println("Невозможно показать список подзадач эпик-задачи.");
@@ -203,42 +207,33 @@ public class InMemoryTaskManager implements TaskTracker {
     }
 
     @Override
-    public boolean checkTaskExistence(int taskId) {
+    public Class checkExistence(int id) {
+        boolean isExistence = false;
         for (Task task : tasks.values()) {
-            if (task.id == taskId) {
-                return true;
-            } else {
-                System.out.println("\n Задачи с таким id (" + taskId + ") нет!");
-                return false;
+            if (task.getId() == id) {
+                isExistence = true;
+                return Class.TASK;
             }
         }
-        return false;
-    }
-
-    @Override
-    public boolean checkEpicExistence(int epicId) {
         for (EpicTask epic : epics.values()) {
-            if (epic.id == epicId) {
-                return true;
+            if (epic.getId() == id) {
+                isExistence = true;
+                return Class.EPIC;
             }
-
         }
-        System.out.println("\n Эпик-задачи с таким id (" + epicId + ") нет!");
-        return false;
-    }
-
-    @Override
-    public boolean checkSubExistence(int subId) {
         for (SubTask sub : subs.values()) {
-            if (sub.id == subId) {
-                return true;
-            } else {
-                System.out.println("\n Подзадачи с таким id (" + subId + ") нет!");
-                return false;
+            if (sub.getId() == id) {
+                isExistence = true;
+                return Class.SUB;
             }
         }
-        return false;
+        if (isExistence = false) {
+            System.out.println("\n Задачи с таким id (" + id + ") нет!");
+            return null;
+        }
+        return null;
     }
+
 
 }
 
