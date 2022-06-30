@@ -1,3 +1,6 @@
+import Interfaces.HistoryManager;
+import Interfaces.TaskTracker;
+
 public  class Managers  {
 
     public static TaskTracker getDefault() {

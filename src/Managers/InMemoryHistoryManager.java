@@ -1,6 +1,9 @@
 import java.util.ArrayList;
 import java.util.List;
 
+import Interfaces.HistoryManager;
+import Tasks.*;
+
 public class InMemoryHistoryManager implements HistoryManager {
     private List<Task> story = new ArrayList<>();
 

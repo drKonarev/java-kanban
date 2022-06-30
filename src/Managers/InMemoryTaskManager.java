@@ -1,12 +1,15 @@
-import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import Interfaces.HistoryManager;
+import Interfaces.TaskTracker;
+import Tasks.*;
 
 public class InMemoryTaskManager implements TaskTracker {
     private HashMap<Integer, Task> tasks = new HashMap<>();
     private HashMap<Integer, SubTask> subs = new HashMap<>();
     private HashMap<Integer, EpicTask> epics = new HashMap<>();
-    static int index = 0;
+    public static  int index = 0;
 
     HistoryManager historyManager = Managers.getDefaultHistory();
 
