@@ -49,7 +49,7 @@ public class InMemoryTaskManager implements TaskTracker {
         historyManager.add(epic);
     }
 
-    public void remove(int id) {
+    public void remove(Integer id) {
         if (checkExistence(id) != null) {
             switch (checkExistence(id)) {
                 case TASK:
@@ -123,7 +123,6 @@ public class InMemoryTaskManager implements TaskTracker {
                 epic.setStatus(EpicTask.Status.IN_PROGRESS);
             } else {
                 epic.setStatus(EpicTask.Status.DONE);
-                //EpicTask.Status status = EpicTask.Status.IN_PROGRESS;
             }
         } else {
             if (!actualStatus.contains(EpicTask.Status.IN_PROGRESS) && !actualStatus.contains(EpicTask.Status.DONE)) {

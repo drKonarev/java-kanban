@@ -65,20 +65,19 @@ public class Main {
         inMemoryTaskManager.addSub(sub2);
         inMemoryTaskManager.addSub(sub3);
         System.out.println(inMemoryTaskManager.historyManager.getHistory()); //проверка методов класса
-        // inMemoryTaskManager.historyManager.showHistory(); //проверка методов класса
+
         inMemoryTaskManager.showTasks(epic1);
         inMemoryTaskManager.showSubList(epic1.getId());
 
         SubTask sub4 = new SubTask("Чтение", "Научиться читать код", SubTask.Status.IN_PROGRESS, epic2.getId());
         inMemoryTaskManager.addSub(sub4);
 
-        inMemoryTaskManager.removeSub(sub4.getId());
 
         inMemoryTaskManager.updateSub(inMemoryTaskManager.getSubTask(50), 4);
 
         inMemoryTaskManager.remove(epic1.getId());
         inMemoryTaskManager.remove(task2.getId());
-
+        inMemoryTaskManager.remove(sub4.getId());
 
         inMemoryTaskManager.showTasks(sub1);
 
