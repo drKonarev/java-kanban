@@ -19,11 +19,13 @@ public class InMemoryTaskManager implements TaskTracker {
         return index++;
     }
 
+
+
     @Override
     public void addTask(Task task) {
         if (task.getClass() == Task.class) {
             tasks.put((task.getId()), task);
-            historyManager.add(task);
+
         } else {
             System.out.println("Указан неверный тип для задачи.");
         }
@@ -36,7 +38,7 @@ public class InMemoryTaskManager implements TaskTracker {
             EpicTask epic = epics.get(sub.getEpicId());
             epic.addSubTask(sub.getId());
             updateEpicStatus(epic);
-            historyManager.add(sub);
+
         } else {
             System.out.println(" Невозможно добавить подзадачу.");
         }
@@ -46,16 +48,19 @@ public class InMemoryTaskManager implements TaskTracker {
     @Override
     public void addEpic(EpicTask epic) {
         epics.put(epic.getId(), epic);
-        historyManager.add(epic);
+
     }
 
     public void remove(Integer id) {
         if (checkExistence(id) != null) {
             switch (checkExistence(id)) {
                 case TASK:
+                    historyManager.remote(id);
                     tasks.remove(id);
+
                     break;
                 case SUB:
+                    historyManager.remote(id);
                     int epicId = subs.get(id).getEpicId();
                     EpicTask epic = epics.get(epicId);
                     epic.getSubTasksList().remove(id);
@@ -65,7 +70,9 @@ public class InMemoryTaskManager implements TaskTracker {
                 case EPIC:
                     epic = epics.get(id);
                     epics.remove(id);
+                    historyManager.remote(id);
                     for (int subId : epic.getSubTasks()) {
+                        historyManager.remote(subId);
                         subs.remove(subId);
                     }
                     break;
@@ -164,6 +171,7 @@ public class InMemoryTaskManager implements TaskTracker {
         tasks.clear();
         subs.clear();
         epics.clear();
+        historyManager.totalRemote();
     }
 
     public void showSubList(int epicId) {
@@ -180,8 +188,10 @@ public class InMemoryTaskManager implements TaskTracker {
 
     @Override
     public Task getTask(int id) {
-        if (tasks.containsKey(id)) return tasks.get(id);
-        else {
+        if (tasks.containsKey(id)) {
+            historyManager.add(tasks.get(id));
+            return tasks.get(id);
+        } else {
             System.out.println("\n С таким id (" + id + ") не найдено ни одной задачи.");
             return null;
         }
@@ -189,8 +199,10 @@ public class InMemoryTaskManager implements TaskTracker {
 
     @Override
     public SubTask getSubTask(int id) {
-        if (subs.containsKey(id)) return subs.get(id);
-        else {
+        if (subs.containsKey(id)) {
+            historyManager.add(subs.get(id));
+            return subs.get(id);
+        } else {
             System.out.println("\n С таким id (" + id + ") не найдено ни одной подзадачи.");
             return null;
         }
@@ -198,8 +210,10 @@ public class InMemoryTaskManager implements TaskTracker {
 
     @Override
     public EpicTask getEpicTask(int id) {
-        if (epics.containsKey(id)) return epics.get(id);
-        else {
+        if (epics.containsKey(id)) {
+            historyManager.add(epics.get(id));
+            return epics.get(id);
+        } else {
             System.out.println("\n С таким id (" + id + ") не найдено ни одной эпик-задачи.");
             return null;
         }

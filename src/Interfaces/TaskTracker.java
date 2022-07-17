@@ -1,6 +1,6 @@
 package Interfaces;
 
-import Managers.InMemoryTaskManager;
+
 import Tasks.*;
 
 public interface TaskTracker {
@@ -10,6 +10,8 @@ public interface TaskTracker {
         EPIC,
         SUB
     }
+
+
 
     void addTask(Task task);
 
