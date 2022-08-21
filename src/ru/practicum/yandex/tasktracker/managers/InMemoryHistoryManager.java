@@ -8,10 +8,12 @@ import ru.practicum.yandex.tasktracker.interfaces.*;
 import ru.practicum.yandex.tasktracker.tasks.*;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    private List<Task> story = new ArrayList<>();
+    protected List<Integer> story = new ArrayList<>();
     private HashMap<Integer, Node> nodeMap = new HashMap<>();
     Node tail = null;
     Node head = null;
+
+    //private void setStory(List)
 
     private static class Node {
         private Node prev;
@@ -28,8 +30,8 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     private void linkLast(Task task) {
         if (nodeMap.containsKey(task.getId())) {
-            story.remove(task);
-            story.add(task);
+            story.remove((Integer) task.getId());
+            story.add(task.getId());
             return;
         }
         final Node node = new Node(null, task, null);
@@ -49,10 +51,9 @@ public class InMemoryHistoryManager implements HistoryManager {
             node.prev = tail;
             tail = node;
         }
-        story.add(node.task);
+        story.add(node.task.getId());
         nodeMap.put(task.getId(), node);
     }
-
 
     @Override
     public void add(Task task) {
@@ -61,7 +62,7 @@ public class InMemoryHistoryManager implements HistoryManager {
 
 
     @Override
-    public List<Task> getHistory() {
+    public List<Integer> getHistory() {
         return story;
     }
 
@@ -85,12 +86,19 @@ public class InMemoryHistoryManager implements HistoryManager {
             node.prev.next = node.next;
             node.next.prev = node.prev;
         }
-        story.remove(node.task);
+        story.remove(node.task.getId());
         nodeMap.remove(id);
     }
 
     @Override
     public void removeAllHistory() {
         nodeMap.clear();
+    }
+
+
+    @Override
+    public void setStory(List<Integer> newStory) {
+        story.clear();
+        story.addAll(newStory);
     }
 }

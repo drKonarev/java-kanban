@@ -1,7 +1,5 @@
 package ru.practicum.yandex.tasktracker.tasks;
 
-import ru.practicum.yandex.tasktracker.managers.InMemoryTaskManager;
-
 import java.util.ArrayList;
 
 public class EpicTask extends Task {
@@ -10,7 +8,9 @@ public class EpicTask extends Task {
 
     public EpicTask(String title, String description) {
         super(title, description, Status.NEW);
+        this.taskType = TaskType.EPIC;
         this.result = "Epic "+ result;
+
     }
 
 

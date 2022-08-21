@@ -7,19 +7,25 @@ import ru.practicum.yandex.tasktracker.interfaces.*;
 import ru.practicum.yandex.tasktracker.tasks.*;
 
 public class InMemoryTaskManager implements TaskTracker {
-    private HashMap<Integer, Task> tasks = new HashMap<>();
-    private HashMap<Integer, SubTask> subs = new HashMap<>();
-    private HashMap<Integer, EpicTask> epics = new HashMap<>();
-    private static int index = 1;
+
+    protected HashMap<Integer, Task> tasks = new HashMap<>();
+    protected HashMap<Integer, SubTask> subs = new HashMap<>();
+    protected HashMap<Integer, EpicTask> epics = new HashMap<>();
+
+
+    protected static int index = 1;
 
     private HistoryManager historyManager = Managers.getDefaultHistory();
+    //private FileBackedTasksManager fileManger = Managers.getDefaultFile();
 
     public HistoryManager getHistoryManager() {
         return historyManager;
     }
 
+
+
     public static int getNewIndex() {
-        return index++;
+        return ++index;
     }
 
     String emptyFile = " Передаваемый объект пуст.";

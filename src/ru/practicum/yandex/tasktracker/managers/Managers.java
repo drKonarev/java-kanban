@@ -2,14 +2,19 @@ package ru.practicum.yandex.tasktracker.managers;
 
 import ru.practicum.yandex.tasktracker.interfaces.*;
 
-public  class Managers  {
+
+public class Managers {
 
     public static TaskTracker getDefault() {
-        return  new InMemoryTaskManager();
+        return new InMemoryTaskManager();
     }
 
-    public static HistoryManager getDefaultHistory(){
+    public static HistoryManager getDefaultHistory() {
         return new InMemoryHistoryManager();
-        }
+    }
 
+
+    public static FileBackedTasksManager getDefaultFile() {
+        return new FileBackedTasksManager();
+    }
 }

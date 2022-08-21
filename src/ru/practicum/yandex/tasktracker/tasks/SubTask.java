@@ -1,21 +1,24 @@
 package ru.practicum.yandex.tasktracker.tasks;
 
-import ru.practicum.yandex.tasktracker.managers.InMemoryTaskManager;
+
 
 public class SubTask extends Task {
+
+    public int getEpicId() {
+        return epicId;
+    }
 
     protected int epicId;
 
     public SubTask(String title, String description, Status status, int epicId) {
         super(title, description, status);
         this.epicId = epicId;
+        this.taskType = TaskType.SUB;
         this. result = "Sub "+ result +"' }";
     }
 
 
-    public int getEpicId() {
-        return epicId;
-    }
+
 
     public int getId() {
         return id;

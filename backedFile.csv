@@ -1,0 +1,7 @@
+id, type, name, status, description, epicId
+1,TASK,NEW,Description task1
+9,TASK,IN_PROGRESS,С первой попытки
+2,EPIC,NEW,Description epic2
+3,SUB,DONE,Description sub task32,
+
+null

@@ -8,6 +8,14 @@ public class Task {
     protected int id;
     protected Status status;
 
+
+
+
+    public TaskType getTaskType() {
+        return taskType;
+    }
+
+    protected TaskType taskType;
     protected String result;
 
     public enum Status {
@@ -20,33 +28,28 @@ public class Task {
         return title;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
 
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
 
     public Task(String title, String description, Status newStatus) {
         this.title = title;
         this.description = description;
         this.status = newStatus;
-
+        this.taskType = TaskType.TASK;
         setId(InMemoryTaskManager.getNewIndex());
         this.id = getId();
 
-        this.result =  "Task {" +
+        this.result = "Task {" +
                 "title '" + title + '\'' +
                 ", description '" + description + '\'' +
                 ", status '" + status + '\'' +
-                ", id '" + id ;
+                ", id '" + id;
 
     }
+
 
     public Status getStatus() {
         return status;
@@ -66,7 +69,7 @@ public class Task {
 
 
     public String toString() {
-        return result +"' }";
+        return result + "' }";
     }
 
 }

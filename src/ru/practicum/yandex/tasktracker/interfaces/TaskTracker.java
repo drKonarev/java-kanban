@@ -1,26 +1,17 @@
 package ru.practicum.yandex.tasktracker.interfaces;
 
 
+import ru.practicum.yandex.tasktracker.managers.ManagerSaveException;
 import ru.practicum.yandex.tasktracker.tasks.*;
 
 public interface TaskTracker {
 
-    enum TaskType {
-        TASK,
-        EPIC,
-        SUB,
 
-        NULL
-
-    }
-
-
-    void addTask(Task task);
+    void addTask(Task task) ;
 
     void addSub(SubTask sub);
 
     void addEpic(EpicTask epic);
-
 
     void updateTask(Task task);
 
