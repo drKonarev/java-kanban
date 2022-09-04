@@ -49,7 +49,21 @@ public class Task {
                 ", id '" + id;
 
     }
+    public Task(String title, String description, Status newStatus, int id) {
+        this.title = title;
+        this.description = description;
+        this.status = newStatus;
+        this.taskType = TaskType.TASK;
+        setId(InMemoryTaskManager.getNewIndex());
+        this.id = id;
 
+        this.result = "Task {" +
+                "title '" + title + '\'' +
+                ", description '" + description + '\'' +
+                ", status '" + status + '\'' +
+                ", id '" + id;
+
+    }
 
     public Status getStatus() {
         return status;

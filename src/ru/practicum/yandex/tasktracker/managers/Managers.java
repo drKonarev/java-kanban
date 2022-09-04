@@ -5,7 +5,7 @@ import ru.practicum.yandex.tasktracker.interfaces.*;
 
 public class Managers {
 
-    public static TaskTracker getDefault() {
+    public static InMemoryTaskManager getDefault() {
         return new InMemoryTaskManager();
     }
 

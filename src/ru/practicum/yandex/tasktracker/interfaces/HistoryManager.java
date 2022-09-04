@@ -14,5 +14,8 @@ public interface HistoryManager {
 
     void removeAllHistory();
 
-    abstract void setStory(List<Integer> newStory);
+    void setStory(List<Integer> newStory);
+
+
+
 }

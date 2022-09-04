@@ -16,7 +16,12 @@ public class SubTask extends Task {
         this.taskType = TaskType.SUB;
         this. result = "Sub "+ result +"' }";
     }
-
+    public SubTask(String title, String description, Status status, int epicId, int id) {
+        super(title, description, status, id);
+        this.epicId = epicId;
+        this.taskType = TaskType.SUB;
+        this. result = "Sub "+ result +"' }";
+    }
 
 
 

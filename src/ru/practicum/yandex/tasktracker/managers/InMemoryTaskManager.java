@@ -16,12 +16,10 @@ public class InMemoryTaskManager implements TaskTracker {
     protected static int index = 1;
 
     private HistoryManager historyManager = Managers.getDefaultHistory();
-    //private FileBackedTasksManager fileManger = Managers.getDefaultFile();
 
     public HistoryManager getHistoryManager() {
         return historyManager;
     }
-
 
 
     public static int getNewIndex() {
@@ -31,35 +29,28 @@ public class InMemoryTaskManager implements TaskTracker {
     String emptyFile = " Передаваемый объект пуст.";
 
     @Override
-    public void addTask(Task task) {
-        if (task.getClass() == Task.class) {
-            tasks.put((task.getId()), task);
-
-        } else {
-            System.out.println("Указан неверный тип для задачи.");
+    public void addAnyTask(Task task) {
+        switch (task.getTaskType()) {
+            case TASK:
+                tasks.put((task.getId()), task);
+                break;
+            case EPIC:
+                epics.put(task.getId(), (EpicTask) task);
+                break;
+            case SUB:
+                subs.put(task.getId(), (SubTask) task);
+                if (checkExistence((subs.get(task.getId()).getEpicId())) == TaskType.EPIC) {
+                    EpicTask epic = epics.get(subs.get(task.getId()).getEpicId());
+                    epic.addSubTask(task.getId());
+                    updateEpicStatus(epic);
+                }
         }
     }
 
-    @Override
-    public void addSub(SubTask sub) {
-        subs.put(sub.getId(), sub);
-        if (checkExistence(sub.getEpicId()) == TaskType.EPIC) {
-            EpicTask epic = epics.get(sub.getEpicId());
-            epic.addSubTask(sub.getId());
-            updateEpicStatus(epic);
 
-        } else {
-            System.out.println(" Невозможно добавить подзадачу.");
-        }
 
-    }
 
     @Override
-    public void addEpic(EpicTask epic) {
-        epics.put(epic.getId(), epic);
-
-    }
-
     public void remove(Integer id) {
         switch (checkExistence(id)) {
             case TASK:
@@ -68,7 +59,7 @@ public class InMemoryTaskManager implements TaskTracker {
 
                 break;
             case SUB:
-                historyManager.remove(id);
+                historyManager.remove((Integer) id);
                 int epicId = subs.get(id).getEpicId();
                 EpicTask epic = epics.get(epicId);
                 epic.getSubTasksList().remove(id);
@@ -183,6 +174,7 @@ public class InMemoryTaskManager implements TaskTracker {
         subs.clear();
         epics.clear();
         historyManager.removeAllHistory();
+        System.out.println("Выполнено полное удаление!");
     }
 
     public void showSubList(int epicId) {
@@ -225,7 +217,6 @@ public class InMemoryTaskManager implements TaskTracker {
     public TaskType checkExistence(int id) {
         if (tasks.containsKey(id)) {
             return TaskType.TASK;
-            // }
         } else {
             if (epics.containsKey(id)) {
                 return TaskType.EPIC;

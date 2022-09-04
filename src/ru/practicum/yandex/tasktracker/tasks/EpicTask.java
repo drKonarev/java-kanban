@@ -12,7 +12,12 @@ public class EpicTask extends Task {
         this.result = "Epic "+ result;
 
     }
+    public EpicTask(String title, String description, int id) {
+        super(title, description, Status.NEW, id);
+        this.taskType = TaskType.EPIC;
+        this.result = "Epic "+ result;
 
+    }
 
     public ArrayList<Integer> getSubTasks() {
         return subTasksList;

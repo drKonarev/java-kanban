@@ -7,11 +7,8 @@ import ru.practicum.yandex.tasktracker.tasks.*;
 public interface TaskTracker {
 
 
-    void addTask(Task task) ;
+    void addAnyTask (Task task);
 
-    void addSub(SubTask sub);
-
-    void addEpic(EpicTask epic);
 
     void updateTask(Task task);
 
@@ -20,6 +17,8 @@ public interface TaskTracker {
     void showTasks(Task task);
 
     void totalRemove();
+
+    void remove (Integer id);
 
     Task getAnyTask(int id);
 

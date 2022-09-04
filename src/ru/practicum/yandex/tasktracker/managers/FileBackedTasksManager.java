@@ -1,12 +1,10 @@
 package ru.practicum.yandex.tasktracker.managers;
 
 
-import ru.practicum.yandex.tasktracker.interfaces.HistoryManager;
 import ru.practicum.yandex.tasktracker.interfaces.TaskTracker;
 import ru.practicum.yandex.tasktracker.tasks.EpicTask;
 import ru.practicum.yandex.tasktracker.tasks.SubTask;
 import ru.practicum.yandex.tasktracker.tasks.Task;
-import ru.practicum.yandex.tasktracker.tasks.TaskType;
 
 
 import java.io.*;
@@ -22,7 +20,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskT
 
     public static void main(String[] args) {
 
-        FileBackedTasksManager manager = new FileBackedTasksManager();
+        FileBackedTasksManager manager = Managers.getDefaultFile();
         Task task1 = new Task("Вылезти 6b+", "С первой попытки", Task.Status.IN_PROGRESS);
         Task task2 = new Task("Вылезти 7b+", "Со второй попытки", Task.Status.IN_PROGRESS);
         EpicTask epic1 = new EpicTask("5-ий спринт", "Сдать с первой попытки");
@@ -30,21 +28,25 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskT
         SubTask sub1 = new SubTask("Теория", "Декомпозировать задание", Task.Status.DONE, epic2.getId());
         SubTask sub2 = new SubTask("Практика", "Написать и отладить код", Task.Status.DONE, epic1.getId());
         SubTask sub3 = new SubTask("Отладка", "Успевай как хочешь ;)", Task.Status.IN_PROGRESS, epic2.getId());
-        manager.addTask(task1);
-        manager.addTask(task2);
-        manager.addEpic(epic1);
-        manager.addEpic(epic2);
-        manager.addSub(sub1);
-        manager.addSub(sub2);
-        manager.addSub(sub3);
+        manager.addAnyTask(task1);
+        manager.addAnyTask(task2);
+        manager.addAnyTask(epic1);
+        manager.addAnyTask(epic2);
+        manager.addAnyTask(sub1);
+        manager.addAnyTask(sub2);
+        manager.addAnyTask(sub3);
         manager.getAnyTask(2);
         manager.getAnyTask(4);
         FileBackedTasksManager newManager = loadFromFile(file);
-        newManager.addTask(new Task("Вылезти 6c+", "С ", Task.Status.DONE));
-        newManager.addEpic(new EpicTask("26-ий спринт", "Сдать "));
-        newManager.addSub(new SubTask("Сложность", "Декодинг", Task.Status.DONE, 5));
+        newManager.addAnyTask(new Task("Вылезти 6c+", "С ", Task.Status.DONE));
+        newManager.addAnyTask(new EpicTask("26-ий спринт", "Сдать "));
+        newManager.addAnyTask(new SubTask("Сложность", "Декодинг", Task.Status.DONE, 5));
         newManager.getAnyTask(4);
         System.out.println(newManager.getHistoryManager().getHistory());
+        newManager.remove(4);
+        System.out.println(newManager.getHistoryManager().getHistory());
+        newManager.getAnyTask(4);
+        //newManager.totalRemove();
     }
 
 
@@ -73,19 +75,13 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskT
         final FileBackedTasksManager taskManager = new FileBackedTasksManager();
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line = br.readLine();
+            line = br.readLine(); // пропускаем первую строку
             while (!(line.isBlank())) {
-                if (line.contains("EPIC")) {
-                    taskManager.epics.put(CSVFormatter.epicFromString(line).getId(), CSVFormatter.epicFromString(line));
-                } else if (line.contains("SUB")) {
-                    taskManager.subs.put(CSVFormatter.subFromString(line).getId(), CSVFormatter.subFromString(line));
-                    taskManager.epics.get(CSVFormatter.subFromString(line).getEpicId()).addSubTask(CSVFormatter.subFromString(line).getId()); // кладем в эпик сабтаску
-
-                } else if (line.contains("TASK")) {
-                    taskManager.tasks.put(CSVFormatter.taskFromString(line).getId(), CSVFormatter.taskFromString(line));
-                }
+                taskManager.addTaskFromFile(CSVFormatter.taskFromString(line));
                 line = br.readLine();// прочитали пустую строку
             }
             taskManager.getHistoryManager().setStory(CSVFormatter.historyFromString(br.readLine()));
+          // для добавления мапы с нодами нужно создать метод, который бы создавал из истории ноду
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -95,29 +91,28 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskT
     }
 
 
-    @Override
-    public HistoryManager getHistoryManager() {
-        return super.getHistoryManager();
+    private void addTaskFromFile(Task task) {
+        if (task == null) {
+            System.out.println("Передаваемый объект пуст!");
+            return;
+        }
+        switch (task.getTaskType()) {
+            case TASK:
+                tasks.put(task.getId(), task);
+                break;
+            case SUB:
+                subs.put(task.getId(), (SubTask) task);
+                break;
+            case EPIC:
+                epics.put(task.getId(), (EpicTask) task);
+        }
     }
 
-    @Override
-    public void addTask(Task task) {
-        super.addTask(task);
-        save();
-    }
-
 
     @Override
-    public void addSub(SubTask sub) {
-        super.addSub(sub);
+    public void addAnyTask(Task task) {
+        super.addAnyTask(task);
         save();
-    }
-
-    @Override
-    public void addEpic(EpicTask epic) {
-        super.addEpic(epic);
-        save();
-
     }
 
     @Override
@@ -139,10 +134,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskT
         save();
     }
 
-    @Override
-    public void showTasks(Task object) {
-        super.showTasks(object);
-    }
 
     @Override
     public void totalRemove() {
@@ -150,10 +141,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskT
         save();
     }
 
-    @Override
-    public void showSubList(int epicId) {
-        super.showSubList(epicId);
-    }
 
     @Override
     public Task getAnyTask(int id) {
@@ -178,10 +165,5 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskT
                 return null;
 
         }
-    }
-
-    @Override
-    public TaskType checkExistence(int id) {
-        return super.checkExistence(id);
     }
 }

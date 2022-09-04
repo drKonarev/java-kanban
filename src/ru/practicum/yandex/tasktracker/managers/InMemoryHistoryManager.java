@@ -13,7 +13,6 @@ public class InMemoryHistoryManager implements HistoryManager {
     Node tail = null;
     Node head = null;
 
-    //private void setStory(List)
 
     private static class Node {
         private Node prev;
@@ -72,27 +71,38 @@ public class InMemoryHistoryManager implements HistoryManager {
         Node node = nodeMap.get(id);
         if (node == null) return;
 
-        if (node.next == null && node.prev == null) nodeMap.clear();
+        while (story.contains(node.task.getId())) {
+            story.remove((Integer) node.task.getId());
+        }
+
+        if (node.next == null && node.prev == null) {
+            nodeMap.clear();
+            return;
+        }
 
         if (node.prev == null && node.next != null) {
             node.next.prev = null;
             head = node.next;
+            nodeMap.remove(id);
+            return;
         }
         if (node.prev != null && node.next == null) {
             node.prev.next = null;
             tail = node.prev;
+            nodeMap.remove(id);
+            return;
         }
         if (node.prev != null && node.next != null) {
             node.prev.next = node.next;
             node.next.prev = node.prev;
+            nodeMap.remove(id);
         }
-        story.remove(node.task.getId());
-        nodeMap.remove(id);
     }
 
     @Override
     public void removeAllHistory() {
         nodeMap.clear();
+        story.clear();
     }
 
 

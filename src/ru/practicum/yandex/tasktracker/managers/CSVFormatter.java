@@ -5,6 +5,7 @@ import ru.practicum.yandex.tasktracker.interfaces.HistoryManager;
 import ru.practicum.yandex.tasktracker.tasks.EpicTask;
 import ru.practicum.yandex.tasktracker.tasks.SubTask;
 import ru.practicum.yandex.tasktracker.tasks.Task;
+import ru.practicum.yandex.tasktracker.tasks.TaskType;
 
 
 import java.util.ArrayList;
@@ -47,55 +48,27 @@ public class CSVFormatter {
         return history;
     }
 
-    public static Task taskFromString(String line) {
-        String[] lines = line.split(",");
-        int id = Integer.parseInt(lines[0]);
-        String nameTask = lines[2];
-        Task.Status taskStatus = Task.Status.NEW;
-        if (lines[3].equals("IN_PROGRESS")) {
-            taskStatus = Task.Status.IN_PROGRESS;
-        } else {
-            if (lines[3].equals("DONE")) {
-                taskStatus = Task.Status.DONE;
-            }
+    public static Task taskFromString(String line){
+        final String[] lines = line.split(",");
+        final int id = Integer.parseInt(lines[0]);
+        final TaskType type = TaskType.valueOf(lines[1]);
+        final String name = lines[2];
+        final Task.Status status = Task.Status.valueOf(lines[3]);
+        final String description = lines[4];
+        switch (type) {
+            case TASK:
+                InMemoryTaskManager.index = id;
+                return new Task(name, description, status, id);
+            case EPIC:
+                InMemoryTaskManager.index = id;
+                return new EpicTask(name, description, id);
+            case SUB:
+                InMemoryTaskManager.index = id;
+                return new SubTask(name, description, status, Integer.parseInt(lines[5]), id);
         }
-        String description = lines[4];
-        Task task = new Task(nameTask, description, taskStatus);
-        task.setId(id);
-        InMemoryTaskManager.index = id;
-        return task;
+        return null; // заглушка
     }
 
-    public static SubTask subFromString(String line) {
-        String[] lines = line.split(",");
-        int id = Integer.parseInt(lines[0]);
-        String nameTask = lines[2];
-        Task.Status taskStatus = Task.Status.NEW;
-        if (lines[3].equals("IN_PROGRESS")) {
-            taskStatus = Task.Status.IN_PROGRESS;
-        } else {
-            if (lines[3].equals("DONE")) {
-                taskStatus = Task.Status.DONE;
-            }
-        }
-        String description = lines[4];
-        SubTask task = new SubTask(nameTask, description, taskStatus, Integer.parseInt(lines[5]));
-        task.setId(id);
-        InMemoryTaskManager.index = id;
-
-        return task;
-    }
-
-    public static EpicTask epicFromString(String line) {
-        String[] lines = line.split(",");
-        int id = Integer.parseInt(lines[0]);
-        String nameTask = lines[2];
-        String description = lines[4];
-        EpicTask task = new EpicTask(nameTask, description);
-        task.setId(id);
-        InMemoryTaskManager.index = id;
-        return task;
-    }
 }
 
 
