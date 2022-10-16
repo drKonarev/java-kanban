@@ -1,14 +1,12 @@
 package ru.practicum.yandex.tasktracker.interfaces;
 
 
-import ru.practicum.yandex.tasktracker.managers.ManagerSaveException;
 import ru.practicum.yandex.tasktracker.tasks.*;
 
 public interface TaskTracker {
 
 
-    void addAnyTask (Task task);
-
+    void addAnyTask(Task task);
 
     void updateTask(Task task);
 
@@ -18,7 +16,7 @@ public interface TaskTracker {
 
     void totalRemove();
 
-    void remove (Integer id);
+    void remove(Integer id);
 
     Task getAnyTask(int id);
 

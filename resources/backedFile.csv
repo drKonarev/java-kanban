@@ -1,12 +1,6 @@
-id, type, name, status, description, epicId
-2,TASK,Вылезти 6b+,IN_PROGRESS,С первой попытки
-3,TASK,Вылезти 7b+,IN_PROGRESS,Со второй попытки
-10,TASK,Вылезти 6c+,DONE,С 
-5,EPIC,6-ый спринт,DONE,Уложиться в мягкий дедлайн
-11,EPIC,26-ий спринт,NEW,Сдать 
-6,SUB,Теория,DONE,Декомпозировать задание,5
-7,SUB,Практика,DONE,Написать и отладить код,4
-8,SUB,Отладка,IN_PROGRESS,Успевай как хочешь ;),5
-12,SUB,Сложность,DONE,Декодинг,5
+id, type, name, status, description, startTime, duration, epicId
+3, TASK, task, DONE, task, 15. 10. 2022; 12:00, 60
+1, EPIC, epic, NEW, epic, 16. 10. 2022; 12:00, 60
+2, SUB, sub, NEW, sub, 16. 10. 2022; 12:00, 60, 1
 
-2
+Story is empty!

@@ -1,7 +1,7 @@
 package ru.practicum.yandex.tasktracker.managers;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.time.Duration;
+import java.util.*;
 
 import ru.practicum.yandex.tasktracker.interfaces.*;
 import ru.practicum.yandex.tasktracker.tasks.*;
@@ -12,6 +12,22 @@ public class InMemoryTaskManager implements TaskTracker {
     protected HashMap<Integer, SubTask> subs = new HashMap<>();
     protected HashMap<Integer, EpicTask> epics = new HashMap<>();
 
+    protected TreeSet<Task> priorityList = new TreeSet<>(Comparator.comparing(Task::getStartTime));
+
+    protected TreeSet<Task> getPriorityList() {
+        return priorityList;
+    }
+
+    public void printPriorityList() {
+        if (priorityList.isEmpty()) {
+            System.out.println("No one task wasn't add in manager!");
+            return;
+        }
+        System.out.println("\n Tasks sorted by startTime: \n");
+        priorityList.stream()
+                .map(Task::getTitleIdTAndiming)
+                .forEach(System.out::println);
+    }
 
     protected static int index = 1;
 
@@ -28,26 +44,60 @@ public class InMemoryTaskManager implements TaskTracker {
 
     String emptyFile = " Передаваемый объект пуст.";
 
+    private boolean checkAndAddList(Task task) {
+        if (priorityList.isEmpty()) {
+            priorityList.add(task);
+            return true;
+        } else {
+            Iterator<Task> iterator = priorityList.iterator();
+            while (iterator.hasNext()) {
+                Task current = iterator.next();
+                if (
+                        (task.getStartTime().isBefore(current.getEndTime()) &&
+                                task.getStartTime().isAfter(current.getStartTime())) ||
+                                (task.getEndTime().isBefore(current.getEndTime()) &&
+                                        task.getEndTime().isAfter(current.getStartTime())) ||
+                                (task.getStartTime().isBefore(current.getStartTime()) &&
+                                        task.getEndTime().isAfter(current.getEndTime()))
+                ) {
+                    System.out.println("Current task start earlier then last task end");
+                    return false;
+                }
+            }
+            priorityList.add(task);
+            return true;
+        }
+    }
+
     @Override
     public void addAnyTask(Task task) {
+        if (task == null) {
+            System.out.println("Task is empty, cannot add task.");
+            return;
+        }
         switch (task.getTaskType()) {
             case TASK:
-                tasks.put((task.getId()), task);
-                break;
+                if (checkAndAddList(task)) {
+                    tasks.put((task.getId()), task);
+                    break;
+                } else return;
             case EPIC:
                 epics.put(task.getId(), (EpicTask) task);
                 break;
             case SUB:
-                subs.put(task.getId(), (SubTask) task);
-                if (checkExistence((subs.get(task.getId()).getEpicId())) == TaskType.EPIC) {
-                    EpicTask epic = epics.get(subs.get(task.getId()).getEpicId());
-                    epic.addSubTask(task.getId());
-                    updateEpicStatus(epic);
-                }
+                if (checkAndAddList((SubTask) task)) {
+                    subs.put(task.getId(), (SubTask) task);
+                    if (checkExistence((subs.get(task.getId()).getEpicId())) == TaskType.EPIC) {
+                        EpicTask epic = epics.get(subs.get(task.getId()).getEpicId());
+                        epic.addSubTask(task.getId());
+                        updateEpicStatus(epic);
+                        updateEpicTiming(epic);
+                    } else {
+                        subs.remove(task.getId());
+                    }
+                } else return;
         }
     }
-
-
 
 
     @Override
@@ -62,9 +112,10 @@ public class InMemoryTaskManager implements TaskTracker {
                 historyManager.remove((Integer) id);
                 int epicId = subs.get(id).getEpicId();
                 EpicTask epic = epics.get(epicId);
-                epic.getSubTasksList().remove(id);
+                epic.getSubTasks().remove(id);
                 subs.remove(id);
                 updateEpicStatus(epic);
+                updateEpicTiming(epic);
                 break;
             case EPIC:
                 epic = epics.get(id);
@@ -109,6 +160,7 @@ public class InMemoryTaskManager implements TaskTracker {
             subs.put(sub.getId(), sub);
             EpicTask epic = epics.get(subs.get(sub.getId()).getEpicId());
             updateEpicStatus(epic);
+            updateEpicTiming(epic);
         } else {
             System.out.println(" Невозможно обновить подзадачу. Проверьте id.");
         }
@@ -199,14 +251,13 @@ public class InMemoryTaskManager implements TaskTracker {
 
             case SUB:
                 historyManager.add(subs.get(id));
-                return subs.get(id);
+                return (SubTask) subs.get(id);
 
             case EPIC:
                 historyManager.add(epics.get(id));
-                return epics.get(id);
+                return (EpicTask) epics.get(id);
 
             default:
-                System.out.println("\n С таким id (" + id + ") не найдено ни одной задачи.");
                 return null;
 
         }
@@ -232,7 +283,70 @@ public class InMemoryTaskManager implements TaskTracker {
 
     }
 
+    @Override
+    public String toString() {
+        return "Tasks amount - " + tasks.size() + "\n" +
+                "SubTasks amount - " + subs.size() + "\n" +
+                "EpicTasks amount - " + epics.size() + "\n";
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 17;
+        if (tasks != null && epics != null && subs != null) {
+            hash = tasks.hashCode() + epics.hashCode() + subs.hashCode();
+        }
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (this.getClass() != obj.getClass()) return false;
+        InMemoryTaskManager otherManager = (InMemoryTaskManager) obj;
+        return tasks.size() == otherManager.tasks.size() &&
+                epics.size() == otherManager.epics.size() &&
+                subs.size() == otherManager.subs.size() &&
+                equalMaps(epics, otherManager.epics) &&
+                equalMaps(tasks, otherManager.tasks) &&
+                equalMaps(subs, otherManager.subs);
+
+    }
+
+    public static <K, V> boolean equalMaps(HashMap<K, V> m1, HashMap<K, V> m2) {
+        if (m1.size() != m2.size()) return false;
+        for (K key : m1.keySet())
+            if (!m1.get(key).equals(m2.get(key)))
+                return false;
+        return true;
+    }
+
+    private void updateEpicTiming(EpicTask epic) {
+        if (epic.getSubTasks().isEmpty()) {
+            System.out.println("Список подзадач пуст!");
+            return;
+        }
+        Duration sumDuration = Duration.ofMinutes(0);
+
+        epic.setStartTime(subs.get(epic.getSubTasks().get(0)).getStartTime());
+        epic.setEndTime(subs.get(epic.getSubTasks().get(0)).getEndTime());
+
+        for (int subId : epic.getSubTasks()) {
+            if (subs.get(subId).getStartTime().isBefore(epic.getStartTime())) {//проверка на саммое раннее начало задачи
+                epic.setStartTime(subs.get(subId).getStartTime());
+            }
+            if (subs.get(subId).getEndTime().isAfter(epic.getStartTime())) {// проверка на самое позднее окончание задачи
+                epic.setEndTime(subs.get(subId).getEndTime());
+            }
+            sumDuration = sumDuration.plus(subs.get(subId).getDuration());
+            epic.setDuration(sumDuration);
+        }
+        epic.setEndTime(epic.getStartTime().plus(epic.getDuration()));
+    }
 
 }
+
+
 
 

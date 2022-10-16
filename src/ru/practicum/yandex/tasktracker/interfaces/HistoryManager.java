@@ -17,5 +17,4 @@ public interface HistoryManager {
     void setStory(List<Integer> newStory);
 
 
-
 }

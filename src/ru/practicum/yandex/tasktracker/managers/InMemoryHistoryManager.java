@@ -1,20 +1,28 @@
 package ru.practicum.yandex.tasktracker.managers;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.HashMap;
+import ru.practicum.yandex.tasktracker.interfaces.HistoryManager;
+import ru.practicum.yandex.tasktracker.tasks.Task;
 
-import ru.practicum.yandex.tasktracker.interfaces.*;
-import ru.practicum.yandex.tasktracker.tasks.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import static ru.practicum.yandex.tasktracker.managers.InMemoryTaskManager.equalMaps;
 
 public class InMemoryHistoryManager implements HistoryManager {
     protected List<Integer> story = new ArrayList<>();
-    private HashMap<Integer, Node> nodeMap = new HashMap<>();
+
+    HashMap<Integer, Node> nodeMap = new HashMap<>();
     Node tail = null;
+
+    public Node getHead() {
+        return head;
+    }
+
     Node head = null;
 
 
-    private static class Node {
+    static class Node {
         private Node prev;
         private Node next;
         private Task task;
@@ -24,10 +32,46 @@ public class InMemoryHistoryManager implements HistoryManager {
             this.task = task;
             this.next = next;
         }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (obj == null) return false;
+            if (this.getClass() != obj.getClass()) return false;
+            Node otherNode = (Node) obj;
+            if (prev == null && next != null) {
+                return task.equals(otherNode.task) &&
+                        (otherNode.prev == null) &&
+                        next.equals(otherNode.next);
+            }
+            if (prev == null && next == null) {
+                return task.equals(otherNode.task) &&
+                        (otherNode.prev == null) &&
+                        (otherNode.next == null);
+            }
+            if (prev != null && next == null) {
+                return task.equals(otherNode.task) &&
+                        prev.equals(otherNode.prev) &&
+                        (otherNode.next == null);
+            }
+            return task.equals(otherNode.task) &&
+                    prev.equals(otherNode.prev) &&
+                    next.equals(otherNode.next);
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 15;
+            if (task != null) {
+                hash += task.hashCode();
+            }
+            return hash;
+        }
+
     }
 
 
-    private void linkLast(Task task) {
+    void linkLast(Task task) {
         if (nodeMap.containsKey(task.getId())) {
             story.remove((Integer) task.getId());
             story.add(task.getId());
@@ -38,18 +82,22 @@ public class InMemoryHistoryManager implements HistoryManager {
         if (head == null && tail == null) {//нет ни одного нода
             head = node;
 
-        }
-        if (head != null && tail == null) {// есть 1 нод - голова
-            head.next = node;
-            tail = node;
-            tail.prev = head;
+        } else {
+            if (head != null && tail == null) {// есть 1 нод - голова
+                head.next = node;
+                tail = node;
+                tail.prev = head;
 
+            } else {
+                if (tail != null) {// есть >= 2-х нодов
+                    tail.next = node;
+                    node.prev = tail;
+                    tail = node;
+                }
+            }
         }
-        if (tail != null) {// есть >= 2-х нодов
-            tail.next = node;
-            node.prev = tail;
-            tail = node;
-        }
+
+
         story.add(node.task.getId());
         nodeMap.put(task.getId(), node);
     }
@@ -110,5 +158,39 @@ public class InMemoryHistoryManager implements HistoryManager {
     public void setStory(List<Integer> newStory) {
         story.clear();
         story.addAll(newStory);
+        HashMap<Integer, Node> bufferMap = new HashMap<>();
+        for (int id : story) {
+            for (int nodeId : nodeMap.keySet()) {
+                if (nodeId == id) {
+                    bufferMap.put(id, nodeMap.get(id));
+                }
+            }
+        }
+        nodeMap.clear();
+        nodeMap.putAll(bufferMap);
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 17;
+        if (story != null && nodeMap != null) {
+            hash = story.hashCode() + nodeMap.hashCode();
+        }
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (this.getClass() != obj.getClass()) return false;
+        InMemoryHistoryManager otherManager = (InMemoryHistoryManager) obj;
+        return nodeMap.size() == otherManager.nodeMap.size() &&
+                equalMaps(nodeMap, otherManager.nodeMap) &&
+                story.equals(otherManager.story);
+
+
+    }
+
+
 }
