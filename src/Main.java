@@ -34,7 +34,7 @@ public class Main {
         inMemoryTaskManager.getAnyTask(2);
         System.out.println(inMemoryTaskManager.getHistoryManager().getHistory());
 
-//        System.out.println(inMemoryTaskManager.getAnyTask(6).toString());
+
         System.out.println(inMemoryTaskManager.getHistoryManager().getHistory());
 
         inMemoryTaskManager.getAnyTask(6);

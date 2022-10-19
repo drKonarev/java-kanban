@@ -35,21 +35,10 @@ public class SubTask extends Task {
     }
 
 
-    public int getId() {
-        return id;
-    }
-
 
     @Override
     public String toString() {
-        return "SubTask {" +
-                "title '" + this.getTitle() + '\'' +
-                ", description '" + this.getDescription() + '\'' +
-                ", status '" + this.getStatus() + '\'' +
-                ", id '" + this.getId() + '\'' +
-                ", start time '" + this.getStartTime().format(formatter) + '\'' +
-                ", end time '" + this.getEndTime().format(formatter) + '\'' +
-                " }";
+        return "Sub" + super.toString();
     }
 
     @Override

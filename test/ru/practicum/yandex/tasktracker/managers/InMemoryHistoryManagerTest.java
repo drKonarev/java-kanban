@@ -2,6 +2,8 @@ package ru.practicum.yandex.tasktracker.managers;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import ru.practicum.yandex.tasktracker.tasks.EpicTask;
 import ru.practicum.yandex.tasktracker.tasks.SubTask;
 import ru.practicum.yandex.tasktracker.tasks.Task;
@@ -72,48 +74,33 @@ class InMemoryHistoryManagerTest {
         Task task = new Task("task", "task", DONE, 3, "15. 10. 2022; 12:00", 60);
         manager.add(task);
 
-        // Assertions.assertEquals(manager.head, new Node(null, epic, new Node()));
+
         Assertions.assertEquals(manager.nodeMap.keySet(), Set.of(1, 2, 3));
     }
 
-    @Test
-    void removeMidNode() {
+    @ParameterizedTest
+    @ValueSource(ints = {1, 2, 3})
+    void removeNode(Integer argument) {
         EpicTask epic = new EpicTask("epic", "epic", 1);
         manager.add(epic);
         SubTask sub = new SubTask("sub", "sub", NEW, 1, 2, "16. 10. 2022; 12:00", 60);
         manager.add(sub);
         Task task = new Task("task", "task", DONE, 3, "15. 10. 2022; 12:00", 60);
         manager.add(task);
-        manager.remove(2);
-
-        Assertions.assertEquals(manager.nodeMap.keySet(), Set.of(1, 3));
+        manager.remove(argument);
+        switch (argument) {
+            case (1):
+                Assertions.assertEquals(manager.nodeMap.keySet(), Set.of(2, 3));
+                break;
+            case (2):
+                Assertions.assertEquals(manager.nodeMap.keySet(), Set.of(1, 3));
+                break;
+            case (3):
+                Assertions.assertEquals(manager.nodeMap.keySet(), Set.of(1, 2));
+                break;
+        }
     }
 
-    @Test
-    void removeFirstNode() {
-        EpicTask epic = new EpicTask("epic", "epic", 1);
-        manager.add(epic);
-        SubTask sub = new SubTask("sub", "sub", NEW, 1, 2, "16. 10. 2022; 12:00", 60);
-        manager.add(sub);
-        Task task = new Task("task", "task", DONE, 3, "15. 10. 2022; 12:00", 60);
-        manager.add(task);
-        manager.remove(1);
-
-        Assertions.assertEquals(manager.nodeMap.keySet(), Set.of(2, 3));
-    }
-
-    @Test
-    void removeLastNode() {
-        EpicTask epic = new EpicTask("epic", "epic", 1);
-        manager.add(epic);
-        SubTask sub = new SubTask("sub", "sub", NEW, 1, 2, "16. 10. 2022; 12:00", 60);
-        manager.add(sub);
-        Task task = new Task("task", "task", DONE, 3, "15. 10. 2022; 12:00", 60);
-        manager.add(task);
-        manager.remove(3);
-
-        Assertions.assertEquals(manager.nodeMap.keySet(), Set.of(1, 2));
-    }
 
     @Test
     void returnEmptyStory() {

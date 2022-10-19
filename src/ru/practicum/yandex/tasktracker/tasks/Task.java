@@ -18,7 +18,7 @@ public class Task {
     protected LocalDateTime startTime;
     protected LocalDateTime endTime;
     protected TaskType taskType;
-    // protected String result;
+
 
     public enum Status {
         NEW,
@@ -77,7 +77,6 @@ public class Task {
         this.description = description;
         this.status = newStatus;
         this.taskType = TaskType.TASK;
-        setId(InMemoryTaskManager.getNewIndex());
         this.id = id;
     }
 
@@ -89,7 +88,6 @@ public class Task {
         this.description = description;
         this.status = newStatus;
         this.taskType = TaskType.TASK;
-        setId(InMemoryTaskManager.getNewIndex());
         this.id = id;
     }
 
@@ -102,7 +100,7 @@ public class Task {
         this.status = newStatus;
         this.taskType = TaskType.TASK;
         setId(InMemoryTaskManager.getNewIndex());
-        this.id = id;
+
     }
 
     public Status getStatus() {

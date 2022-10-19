@@ -20,9 +20,8 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
     void loadFromEmptyFile() {
 
         Assertions.assertThrows(FileNotFoundException.class,
-                () -> {
-                    new FileReader(new File(pathFile, "NoExistFile.csv"));
-                });
+                () -> new FileReader(new File(pathFile, "NoExistFile.csv"))
+                );
 
 
     }

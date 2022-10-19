@@ -50,15 +50,13 @@ public class InMemoryTaskManager implements TaskTracker {
             return true;
         } else {
             Iterator<Task> iterator = priorityList.iterator();
-            while (iterator.hasNext()) {
-                Task current = iterator.next();
-                if (
-                        (task.getStartTime().isBefore(current.getEndTime()) &&
-                                task.getStartTime().isAfter(current.getStartTime())) ||
-                                (task.getEndTime().isBefore(current.getEndTime()) &&
-                                        task.getEndTime().isAfter(current.getStartTime())) ||
-                                (task.getStartTime().isBefore(current.getStartTime()) &&
-                                        task.getEndTime().isAfter(current.getEndTime()))
+            for (Task current : priorityList) {
+                if ((task.getStartTime().isBefore(current.getEndTime()) &&
+                        task.getStartTime().isAfter(current.getStartTime())) ||
+                        (task.getEndTime().isBefore(current.getEndTime()) &&
+                                task.getEndTime().isAfter(current.getStartTime())) ||
+                        (task.getStartTime().isBefore(current.getStartTime()) &&
+                                task.getEndTime().isAfter(current.getEndTime()))
                 ) {
                     System.out.println("Current task start earlier then last task end");
                     return false;
@@ -109,7 +107,7 @@ public class InMemoryTaskManager implements TaskTracker {
 
                 break;
             case SUB:
-                historyManager.remove((Integer) id);
+                historyManager.remove(id);
                 int epicId = subs.get(id).getEpicId();
                 EpicTask epic = epics.get(epicId);
                 epic.getSubTasks().remove(id);
@@ -251,12 +249,10 @@ public class InMemoryTaskManager implements TaskTracker {
 
             case SUB:
                 historyManager.add(subs.get(id));
-                return (SubTask) subs.get(id);
-
+                return subs.get(id);
             case EPIC:
                 historyManager.add(epics.get(id));
-                return (EpicTask) epics.get(id);
-
+                return epics.get(id);
             default:
                 return null;
 

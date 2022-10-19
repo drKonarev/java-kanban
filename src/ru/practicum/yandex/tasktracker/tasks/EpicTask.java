@@ -39,22 +39,13 @@ public class EpicTask extends Task {
     public String toString() {
 
         if (!subTasksList.isEmpty()) { // проверяем, что поле не содержит null
-            return "EpicTask {" +
-                    "title '" + this.getTitle() + '\'' +
-                    ", description '" + this.getDescription() + '\'' +
-                    ", status '" + this.getStatus() + '\'' +
-                    ", id '" + this.getId() + '\'' +
-                    ", start time '" + this.getStartTime().format(formatter) + '\'' +
-                    ", end time '" + this.getEndTime().format(formatter) + '\'' +
+            return "Epic" + super.toString() +
                     ", sub tasks amount '" +
-                    subTasksList.size() + "' }"; // выводим не значение, а длину
+                    subTasksList.size() + "' }";
+
         } else {
-            return "EpicTask {" +
-                    "title '" + this.getTitle() + '\'' +
-                    ", description '" + this.getDescription() + '\'' +
-                    ", status '" + this.getStatus() + '\'' +
-                    ", id '" + this.getId() + '\'' +
-                    ", sub tasks list is empty , timing is unavailable }; ";// выводим информацию, что поле равно null
+            return "Epic" + super.toString() +
+                    ", sub tasks list is empty , timing is unavailable }";
         }
 
     }
