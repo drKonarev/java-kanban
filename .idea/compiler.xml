@@ -2,7 +2,7 @@
 <project version="4">
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="java-kanban" options="--add-exports jdk.compiler/com.sun.tools.doclint=ALL-UNNAMED --add-exports jdk.jcmd/sun.tools.jstat=ALL-UNNAMED" />
+      <module name="java-kanban" options="--add-exports jdk.compiler/com.sun.tools.doclint=ALL-UNNAMED --add-exports jdk.jcmd/sun.tools.jstat=ALL-UNNAMED --add-exports java.base/jdk.internal.util.xml=ALL-UNNAMED" />
     </option>
   </component>
 </project>

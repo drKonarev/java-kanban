@@ -1,12 +1,26 @@
 package ru.practicum.yandex.tasktracker.managers;
 
 import java.time.Duration;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import ru.practicum.yandex.tasktracker.interfaces.*;
 import ru.practicum.yandex.tasktracker.tasks.*;
 
 public class InMemoryTaskManager implements TaskTracker {
+    public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd. MM. yyyy; HH:mm");
+
+    public HashMap<Integer, Task> getTasks() {
+        return tasks;
+    }
+
+    public HashMap<Integer, SubTask> getSubs() {
+        return subs;
+    }
+
+    public HashMap<Integer, EpicTask> getEpics() {
+        return epics;
+    }
 
     protected HashMap<Integer, Task> tasks = new HashMap<>();
     protected HashMap<Integer, SubTask> subs = new HashMap<>();
@@ -14,7 +28,7 @@ public class InMemoryTaskManager implements TaskTracker {
 
     protected TreeSet<Task> priorityList = new TreeSet<>(Comparator.comparing(Task::getStartTime));
 
-    protected TreeSet<Task> getPriorityList() {
+    public TreeSet<Task> getPriorityList() {
         return priorityList;
     }
 
@@ -25,8 +39,12 @@ public class InMemoryTaskManager implements TaskTracker {
         }
         System.out.println("\n Tasks sorted by startTime: \n");
         priorityList.stream()
-                .map(Task::getTitleIdTAndiming)
+                .map(Task::getTitleAndIdAndTiming)
                 .forEach(System.out::println);
+    }
+
+    public static void setIndex(int index) {
+        InMemoryTaskManager.index = index;
     }
 
     protected static int index = 1;
@@ -44,7 +62,7 @@ public class InMemoryTaskManager implements TaskTracker {
 
     String emptyFile = " Передаваемый объект пуст.";
 
-    private boolean checkAndAddList(Task task) {
+    protected boolean checkAndAddList(Task task) {
         if (priorityList.isEmpty()) {
             priorityList.add(task);
             return true;
@@ -147,6 +165,24 @@ public class InMemoryTaskManager implements TaskTracker {
     }
 
     @Override
+    public List<SubTask> getSubByEpic(int id) {
+        List<SubTask> list = new ArrayList<>();
+        if (checkExistence(id) == TaskType.EPIC) {
+            if (epics.get(id).getSubTasks().isEmpty()) {
+                System.out.println("This epic doesn't contain subs.");
+                return list;
+            }
+            for (int idSub : epics.get(id).getSubTasks()) {
+                list.add(subs.get(idSub));
+            }
+        } else {
+            System.out.println("Type this task isn't EPIC.");
+
+        }
+        return list;
+    }
+
+    @Override
     public void updateSub(SubTask sub) {
         if (sub == null) {
             System.out.println(" Невозможно обновить подзадачу.");
@@ -219,6 +255,17 @@ public class InMemoryTaskManager implements TaskTracker {
     }
 
     @Override
+    public List<Task> GiveEachOneTask() {
+        List<Task> allTasks = new ArrayList<Task>();
+
+        allTasks.addAll(tasks.values());
+        allTasks.addAll(epics.values());
+        allTasks.addAll(subs.values());
+
+        return allTasks;
+    }
+
+    @Override
     public void totalRemove() {
         tasks.clear();
         subs.clear();
@@ -277,6 +324,11 @@ public class InMemoryTaskManager implements TaskTracker {
             }
         }
 
+    }
+
+    @Override
+    public List<Integer> getHistory() {
+        return this.getHistoryManager().getHistory();
     }
 
     @Override

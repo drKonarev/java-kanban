@@ -8,19 +8,21 @@ import java.util.Objects;
 
 public class EpicTask extends Task {
 
+
     protected ArrayList<Integer> subTasksList = new ArrayList<>();
+
 
     public EpicTask(String title, String description) {
         super(title, description, Status.NEW);
         this.taskType = TaskType.EPIC;
-        this.startTime = LocalDateTime.now();
+        this.startTime = LocalDateTime.MAX;
         this.duration = Duration.ZERO;
     }
 
     public EpicTask(String title, String description, int id) {
         super(title, description, Status.NEW, id);
         this.taskType = TaskType.EPIC;
-        this.startTime = LocalDateTime.now();
+        this.startTime = LocalDateTime.MAX;
         this.duration = Duration.ZERO;
     }
 
@@ -37,12 +39,10 @@ public class EpicTask extends Task {
 
     @Override
     public String toString() {
-
         if (!subTasksList.isEmpty()) { // проверяем, что поле не содержит null
             return "Epic" + super.toString() +
                     ", sub tasks amount '" +
                     subTasksList.size() + "' }";
-
         } else {
             return "Epic" + super.toString() +
                     ", sub tasks list is empty , timing is unavailable }";

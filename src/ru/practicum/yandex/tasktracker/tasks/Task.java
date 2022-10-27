@@ -4,12 +4,13 @@ import ru.practicum.yandex.tasktracker.managers.*;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Objects;
+
+import static ru.practicum.yandex.tasktracker.managers.InMemoryTaskManager.formatter;
 
 
 public class Task {
-    public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd. MM. yyyy; HH:mm");
+
     protected String title;
     protected String description;
     protected int id;
@@ -103,6 +104,18 @@ public class Task {
 
     }
 
+    public Task(String title, String description, Status newStatus, String startTime,String endTime, int duration) {
+        this.startTime = LocalDateTime.parse(startTime, formatter);
+        this.duration = Duration.ofMinutes(duration);
+        this.endTime = LocalDateTime.parse(endTime, formatter);
+        this.title = title;
+        this.description = description;
+        this.status = newStatus;
+        this.taskType = TaskType.TASK;
+        setId(InMemoryTaskManager.getNewIndex());
+
+    }
+
     public Status getStatus() {
         return status;
     }
@@ -161,7 +174,7 @@ public class Task {
 
     }
 
-    public String getTitleIdTAndiming() {
+    public String getTitleAndIdAndTiming() {
         return this.getTitle() + " (id: " + this.getId() + ")" + " - " + this.getStartTime().format(formatter);
     }
 }

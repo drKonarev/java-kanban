@@ -11,15 +11,10 @@ import ru.practicum.yandex.tasktracker.tasks.Task;
 
 import static ru.practicum.yandex.tasktracker.tasks.Task.Status.*;
 
-abstract class TaskManagerTest<T extends TaskTracker> {
+public abstract class TaskManagerTest{
 
-    protected T manager;
-    protected T emptyManager;
-
-    public TaskManagerTest(T manager, T emptyManager) {
-        this.manager = manager;
-        this.emptyManager = emptyManager;
-    }
+    public InMemoryTaskManager manager;
+    public InMemoryTaskManager emptyManager;
 
     EpicTask epic;
     SubTask sub;
@@ -27,6 +22,7 @@ abstract class TaskManagerTest<T extends TaskTracker> {
 
     @BeforeEach
     public void beforeEach() {
+        manager = new InMemoryTaskManager();
         epic = new EpicTask("epic", "epic", 1);
         manager.addAnyTask(epic);
         sub = new SubTask("sub", "sub", NEW, 1, 2, "16. 10. 2022; 12:00", 60);

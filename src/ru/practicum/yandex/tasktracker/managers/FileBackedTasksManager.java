@@ -14,6 +14,9 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskT
     public static String pathFile = filePath.toAbsolutePath().getParent() + "/resources/";
     public static File file = new File(pathFile, "backedFile.csv");
 
+    public FileBackedTasksManager() {
+    }
+
     public static void main(String[] args) {
 
         FileBackedTasksManager manager = Managers.getDefaultFile();
@@ -50,7 +53,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskT
     }
 
 
-    void save() throws ManagerSaveException {
+    public void save() throws ManagerSaveException {
         try (FileWriter fr = new FileWriter(file)) {
             fr.write("id, type, name, status, description, startTime, duration, epicId" + System.lineSeparator());
             for (Task task : tasks.values()) {
@@ -180,7 +183,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskT
     public int hashCode() {
         int hash = 17;
         if (tasks != null && epics != null && subs != null) {
-            // hash = tasks.hashCode() + epics.hashCode() + subs.hashCode();
             hash = tasks.size() * 11 + epics.size() + subs.size() * 3;
         }
         return hash;

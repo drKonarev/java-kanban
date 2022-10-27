@@ -2,6 +2,7 @@ package ru.practicum.yandex.tasktracker.managers;
 
 import com.sun.source.tree.Tree;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.practicum.yandex.tasktracker.tasks.SubTask;
 import ru.practicum.yandex.tasktracker.tasks.Task;
@@ -12,12 +13,13 @@ import java.util.TreeSet;
 import static ru.practicum.yandex.tasktracker.tasks.Task.Status.DONE;
 import static ru.practicum.yandex.tasktracker.tasks.Task.Status.NEW;
 
-class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
+class InMemoryTaskManagerTest extends TaskManagerTest {
 
-    public InMemoryTaskManagerTest() {
-        super(new InMemoryTaskManager(), new InMemoryTaskManager());
-    }
 
+@BeforeEach
+void before(){
+    manager = new InMemoryTaskManager();
+}
     @Test
     void testPriorityList() {
 

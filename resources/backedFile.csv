@@ -1,6 +1,7 @@
 id, type, name, status, description, startTime, duration, epicId
-3, TASK, task, DONE, task, 15. 10. 2022; 12:00, 60
-1, EPIC, epic, NEW, epic, 16. 10. 2022; 12:00, 60
-2, SUB, sub, NEW, sub, 16. 10. 2022; 12:00, 60, 1
+2, TASK, Вылезти 6b+, IN_PROGRESS, С первой попытки, 31. 12. +999999999; 23:59, 0
+3, TASK, Вылезти 7b+, IN_PROGRESS, Со второй попытки, 11. 10. 2022; 23:20, 60
+5, EPIC, 6-ый спринт, DONE, Уложиться в мягкий дедлайн, 10. 10. 2022; 12:20, 600
+6, SUB, Теория, DONE, Декомпозировать задание, 10. 10. 2022; 12:20, 600, 5
 
-Story is empty!
+5,2,6

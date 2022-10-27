@@ -7,11 +7,10 @@ import ru.practicum.yandex.tasktracker.tasks.SubTask;
 import ru.practicum.yandex.tasktracker.tasks.Task;
 import ru.practicum.yandex.tasktracker.tasks.TaskType;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
-import static ru.practicum.yandex.tasktracker.tasks.Task.formatter;
+import static ru.practicum.yandex.tasktracker.managers.InMemoryTaskManager.formatter;
 
 
 public class CSVFormatter {
@@ -75,8 +74,10 @@ public class CSVFormatter {
             case SUB:
                 InMemoryTaskManager.index = id;
                 return new SubTask(name, description, status, Integer.parseInt(lines[7].trim()), id, startTime, duration);
+
+            default: return null; // заглушка
         }
-        return null; // заглушка
+
     }
 
 }

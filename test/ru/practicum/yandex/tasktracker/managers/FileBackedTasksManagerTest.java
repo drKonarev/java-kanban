@@ -1,6 +1,7 @@
 package ru.practicum.yandex.tasktracker.managers;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -10,10 +11,11 @@ import java.io.FileReader;
 import static ru.practicum.yandex.tasktracker.managers.FileBackedTasksManager.*;
 
 
-class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager> {
+public class FileBackedTasksManagerTest extends TaskManagerTest {
 
-    public FileBackedTasksManagerTest() {
-        super(new FileBackedTasksManager(), new FileBackedTasksManager());
+    @BeforeEach
+    void before(){
+        manager = new FileBackedTasksManager();
     }
 
     @Test
@@ -21,7 +23,7 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
 
         Assertions.assertThrows(FileNotFoundException.class,
                 () -> new FileReader(new File(pathFile, "NoExistFile.csv"))
-                );
+        );
 
 
     }
@@ -31,7 +33,7 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
         manager.getAnyTask(1);
         manager.getAnyTask(2);
         manager.getAnyTask(3);
-        manager.save();
+        //manager.save();
         emptyManager = loadFromFile(file);
 
         Assertions.assertEquals(manager, emptyManager);
