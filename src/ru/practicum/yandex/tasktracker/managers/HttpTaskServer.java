@@ -41,13 +41,11 @@ public class HttpTaskServer {
                     handleTask(httpExchange);
                     break;
                 case "history":
-                    handleHistory(httpExchange);
+                case "":
+                    handlePriorityAndHistory(httpExchange);
                     break;
                 case "subtasks/epic":
                     handleSubtaskEpic(httpExchange);
-                    break;
-                case "":
-                    handlePriority(httpExchange);
                     break;
                 case "subtask/":
                     handleSubTask(httpExchange);
@@ -80,17 +78,21 @@ public class HttpTaskServer {
                 if (Objects.nonNull(httpExchange.getRequestBody())) {
                     addTaskFromString(epicTaskFromJsonString(readText(httpExchange)));
                     sendText(httpExchange, "Successful add task!");
-                    break;
                 } else {
                     System.out.println("Request body is empty!");
                     httpExchange.sendResponseHeaders(503, -1);
                 }
                 break;
             case "GET":
-                id = Integer.parseInt(query.substring(3));
-                EpicTask epic = (EpicTask) taskManager.getAnyTask(id);
-                String response = gson.toJson(epic);
-                sendText(httpExchange, response);
+                if (Objects.nonNull(query)) {
+                    id = Integer.parseInt(query.substring(3));
+                    EpicTask epic = (EpicTask) taskManager.getAnyTask(id);
+                    String response = gson.toJson(epic);
+                    sendText(httpExchange, response);
+                } else {
+                    String response = gson.toJson(taskManager.getEpics());
+                    sendText(httpExchange, response);
+                }
                 break;
             default:
                 System.out.println("Unknown request method");
@@ -101,7 +103,7 @@ public class HttpTaskServer {
     private EpicTask epicTaskFromJsonString(String line) {
         final String[] lines = line.split(",");
         final int id = Integer.parseInt(lines[3].trim().split(":")[1]);
-        final String name = formatString(lines[0].trim());
+        final String name = formatString(lines[1].trim());
         final String description = formatString(lines[1].trim());
         InMemoryTaskManager.index = id;
         return new EpicTask(name, description, id);
@@ -117,20 +119,25 @@ public class HttpTaskServer {
                 sendText(httpExchange, "SubTask is deleted");
                 break;
             case "GET":
-                id = Integer.parseInt(query.substring(3));
-                SubTask sub = (SubTask) taskManager.getAnyTask(id);
-                String response = gson.toJson(sub);
-                sendText(httpExchange, response);
+                if (Objects.nonNull(query)) { // если передается запрос формата task/id
+                    id = Integer.parseInt(query.substring(3));
+                    SubTask sub = (SubTask) taskManager.getAnyTask(id);
+                    String response = gson.toJson(sub);
+                    sendText(httpExchange, response);
+                } else {
+                    String response = gson.toJson(taskManager.getSubs());
+                    sendText(httpExchange, response);
+                }
                 break;
             case "POST":
                 if (Objects.nonNull(httpExchange.getRequestBody())) {
                     addTaskFromString(subTaskFromJsonString(readText(httpExchange)));
                     sendText(httpExchange, "Successful add task!");
-                    break;
                 } else {
                     System.out.println("Request body is empty!");
                     httpExchange.sendResponseHeaders(503, -1);
                 }
+                break;
             default:
                 System.out.println("Unknown request method");
                 httpExchange.sendResponseHeaders(404, -1);
@@ -143,8 +150,8 @@ public class HttpTaskServer {
         final String name = formatString(lines[1].trim());
         final Task.Status status = Task.Status.valueOf(formatString(lines[4].trim()));
         final String description = formatString(lines[2].trim());
-        final String startTime = StringToTime(lines[7].trim());
-        final int duration = Integer.parseInt((lines[5].trim().split(":")[2]));
+        final String startTime = stringToTime(lines[7].trim());
+        final int duration = Integer.parseInt((lines[5].trim().split(":")[2]))/60;
         final int epicId = Integer.parseInt(lines[0].trim().split(":")[1]);
 
         InMemoryTaskManager.index = id;
@@ -165,10 +172,17 @@ public class HttpTaskServer {
         }
     }
 
-    private void handleHistory(HttpExchange httpExchange) throws IOException {
+
+    private void handlePriorityAndHistory(HttpExchange httpExchange) throws IOException {
         String requestMethod = httpExchange.getRequestMethod();
         if (requestMethod.equals("GET")) {
-            String response = gson.toJson(taskManager.getHistory());
+            String path = httpExchange.getRequestURI().getPath().replaceFirst("/tasks/", "");
+            String response;
+            if (path.equals("history")) {
+                response = gson.toJson(taskManager.getHistory());
+            } else {
+                response = gson.toJson(taskManager.getPriorityList());
+            }
             sendText(httpExchange, response);
         } else {
             System.out.println("Unknown request method");
@@ -176,16 +190,6 @@ public class HttpTaskServer {
         }
     }
 
-    private void handlePriority(HttpExchange httpExchange) throws IOException {
-        String requestMethod = httpExchange.getRequestMethod();
-        if (requestMethod.equals("GET")) {
-            String response = gson.toJson(taskManager.getHistory());
-            sendText(httpExchange, response);
-        } else {
-            System.out.println("Unknown request method");
-            httpExchange.sendResponseHeaders(404, -1);
-        }
-    }
 
     private void handleTask(HttpExchange httpExchange) throws IOException {
         String requestMethod = httpExchange.getRequestMethod();
@@ -197,9 +201,8 @@ public class HttpTaskServer {
                     Task task = taskManager.getAnyTask(id);
                     String response = gson.toJson(task);
                     sendText(httpExchange, response);
-                    break;
                 } else { // если передается запрос формата task/
-                    String response = gson.toJson(taskManager.GiveEachOneTask());
+                    String response = gson.toJson(taskManager.getTasks());
                     sendText(httpExchange, response);
                 }
                 break;
@@ -207,9 +210,7 @@ public class HttpTaskServer {
                 if (Objects.nonNull(query)) { // если передается запрос формата task/id
                     int id = Integer.parseInt(query.substring(2));
                     taskManager.remove(id);
-
                     sendText(httpExchange, "Task is deleted");
-                    break;
                 } else { // если передается запрос формата task/
                     taskManager.totalRemove();
                     sendText(httpExchange, "Total remove complete");
@@ -219,7 +220,6 @@ public class HttpTaskServer {
                 if (Objects.nonNull(httpExchange.getRequestBody())) {
                     addTaskFromString(taskFromJsonString(readText(httpExchange)));
                     sendText(httpExchange, "Successful add task!");
-                    break;
                 } else {
                     System.out.println("Request body is empty!");
                     httpExchange.sendResponseHeaders(503, -1);
@@ -247,8 +247,9 @@ public class HttpTaskServer {
         final String name = formatString(lines[0].trim());
         final Task.Status status = Task.Status.valueOf(formatString(lines[3].trim()));
         final String description = formatString(lines[1].trim());
-        final String startTime = StringToTime(lines[6].trim());
-        final int duration = Integer.parseInt((lines[4].trim().split(":")[2]));
+        final String startTime = stringToTime(lines[6].trim());
+        final int duration = Integer.parseInt((lines[4].trim().split(":")[2]))/60;
+
 
         InMemoryTaskManager.index = id;
         return new Task(name, description, status, id, startTime, duration);
@@ -256,7 +257,11 @@ public class HttpTaskServer {
 
     private String formatString(String line) {
         String[] lines = line.split(":");
-        StringBuilder str = new StringBuilder(lines[1]);
+        return trimLine(lines[1]);
+    }
+
+    private String trimLine(String line) {
+        StringBuilder str = new StringBuilder(line);
         str.deleteCharAt(0);
         str.deleteCharAt(str.length() - 1);
         while (str.indexOf("\"") != -1) {
@@ -268,21 +273,11 @@ public class HttpTaskServer {
         return str.toString();
     }
 
-    private String StringToTime(String line) {
+    private String stringToTime(String line) {
         if (line.isEmpty()) return LocalDateTime.MAX.toString();
         String[] lines = line.split(":");
-        StringBuilder str = new StringBuilder(lines[1] + ":" + lines[2]);
-        str.deleteCharAt(0);
-        str.deleteCharAt(str.length() - 1);
-        while (str.indexOf("\"") != -1) {
-            str.deleteCharAt(str.indexOf("\""));
-        }
-        if (str.indexOf("}") != -1) {
-            str.deleteCharAt(str.indexOf("}"));
-        }
-        return str.toString();
+        return trimLine(lines[1] + ":" + lines[2]);
     }
-
 
     public void stop() {
         System.out.println("Останавливаем сервер на порту " + TASK_SERVER_PORT);

@@ -3,7 +3,6 @@ package ru.practicum.yandex.tasktracker.managers;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.*;
 import ru.practicum.yandex.tasktracker.interfaces.TaskTracker;
-import ru.practicum.yandex.tasktracker.server.HttpTaskManager;
 import ru.practicum.yandex.tasktracker.server.KVServer;
 import ru.practicum.yandex.tasktracker.tasks.EpicTask;
 import ru.practicum.yandex.tasktracker.tasks.SubTask;
@@ -42,6 +41,7 @@ class HttpTaskServerTest {
         httpTaskServer = new HttpTaskServer(taskManager);
 
         gson = Managers.getGson();
+        httpTaskServer.start();
 
         task = new Task("Вылезти 6b+", "С первой попытки", Task.Status.IN_PROGRESS, "11. 10. 2022; 12:20", 600);
         httpTaskServer.taskManager.addAnyTask(task);
@@ -52,7 +52,7 @@ class HttpTaskServerTest {
         sub = new SubTask("Теория", "Декомпозировать задание", Task.Status.DONE, epic.getId(), "10. 10. 2022; 12:20", 600);
         httpTaskServer.taskManager.addAnyTask(sub);
 
-        httpTaskServer.start();
+
     }
 
     @AfterEach
@@ -66,7 +66,7 @@ class HttpTaskServerTest {
     public void getSubTest() throws IOException, InterruptedException {
 
         HttpClient client = HttpClient.newHttpClient();
-        URI url = URI.create("http://localhost:"+TASK_SERVER_PORT+"/tasks/subtask/?id=4");
+        URI url = URI.create("http://localhost:"+TASK_SERVER_PORT+"/tasks/subtask/?id="+sub.getId());
         HttpRequest request = HttpRequest.newBuilder().uri(url).GET().build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
@@ -81,7 +81,7 @@ class HttpTaskServerTest {
     public void getEpicTest() throws IOException, InterruptedException {
 
         HttpClient client = HttpClient.newHttpClient();
-        URI url = URI.create("http://localhost:"+TASK_SERVER_PORT+"/tasks/epictask/?id=3");
+        URI url = URI.create("http://localhost:"+TASK_SERVER_PORT+"/tasks/epictask/?id="+epic.getId());
         HttpRequest request = HttpRequest.newBuilder().uri(url).GET().build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
@@ -98,7 +98,7 @@ class HttpTaskServerTest {
         //отправляем запрос на получение задачи, чтобы она появилась в истории
 
         HttpClient client = HttpClient.newHttpClient();
-        URI url = URI.create("http://localhost:"+TASK_SERVER_PORT+"/tasks/task/?id=2");
+        URI url = URI.create("http://localhost:"+TASK_SERVER_PORT+"/tasks/task/?id="+task.getId());
         HttpRequest request = HttpRequest.newBuilder().uri(url).GET().build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
@@ -200,7 +200,7 @@ class HttpTaskServerTest {
     public void getTaskTest() throws IOException, InterruptedException {
 
         HttpClient client = HttpClient.newHttpClient();
-        URI url = URI.create("http://localhost:"+TASK_SERVER_PORT+"/tasks/task/?id=2");
+        URI url = URI.create("http://localhost:"+TASK_SERVER_PORT+"/tasks/task/?id="+task.getId());
         HttpRequest request = HttpRequest.newBuilder().uri(url).GET().build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 

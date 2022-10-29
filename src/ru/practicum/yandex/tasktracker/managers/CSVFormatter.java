@@ -44,16 +44,15 @@ public class CSVFormatter {
 
     public static List<Integer> historyFromString(String value) {
         history.clear();
-        if (value == null || value.equals("Story is empty!")) {
-            return history;
-        } else {
+        if (value != null && !value.equals("Story is empty!")) {
             String[] values = value.split(",");
             for (String id : values) {
                 history.add(Integer.parseInt(id));
             }
+        }
             return history;
         }
-    }
+
 
     public static Task taskFromString(String line) {
         final String[] lines = line.split(",");

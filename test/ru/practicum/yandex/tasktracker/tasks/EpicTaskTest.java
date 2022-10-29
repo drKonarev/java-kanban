@@ -9,7 +9,7 @@ import ru.practicum.yandex.tasktracker.managers.Managers;
 
 
 class EpicTaskTest {
-    InMemoryTaskManager manager =(InMemoryTaskManager) Managers.getDefault();
+    InMemoryTaskManager manager =new InMemoryTaskManager();
     EpicTask sut;// system under test
     SubTask test1 = new SubTask("test1", "test1", Task.Status.NEW, 1, "15. 10. 2022; 12:00", 60);
     SubTask test2 = new SubTask("test2", "test2", Task.Status.NEW, 1, "16. 10. 2022; 12:00", 60);

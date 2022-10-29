@@ -7,6 +7,8 @@ import ru.practicum.yandex.tasktracker.tasks.Task;
 
 import java.io.*;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FileBackedTasksManager extends InMemoryTaskManager implements TaskTracker {
 
@@ -107,16 +109,17 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskT
             case TASK:
                 tasks.put(task.getId(), task);
                 priorityList.add(task);
-                this.getAnyTask(task.getId());
                 break;
+
             case SUB:
                 subs.put(task.getId(), (SubTask) task);
+                epics.get( ((SubTask) task).getEpicId()).addSubTask(task.getId());
+                updateEpicTiming(epics.get( ((SubTask) task).getEpicId()));
                 priorityList.add(task);
-                this.getAnyTask(task.getId());
                 break;
+
             case EPIC:
                 epics.put(task.getId(), (EpicTask) task);
-                this.getAnyTask(task.getId());
         }
     }
 
@@ -179,27 +182,4 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskT
 
     }
 
-    @Override
-    public int hashCode() {
-        int hash = 17;
-        if (tasks != null && epics != null && subs != null) {
-            hash = tasks.size() * 11 + epics.size() + subs.size() * 3;
-        }
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null) return false;
-        if (this.getClass() != obj.getClass()) return false;
-        FileBackedTasksManager otherManager = (FileBackedTasksManager) obj;
-        return tasks.size() == otherManager.tasks.size() &&
-                epics.size() == otherManager.epics.size() &&
-                subs.size() == otherManager.subs.size() &&
-                equalMaps(epics, otherManager.epics) &&
-                equalMaps(tasks, otherManager.tasks) &&
-                equalMaps(subs, otherManager.subs);// &&
-        //getHistoryManager().equals(otherManager.getHistoryManager());
-    }
 }

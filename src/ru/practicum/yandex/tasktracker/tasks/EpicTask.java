@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 
+import static ru.practicum.yandex.tasktracker.managers.InMemoryTaskManager.formatter;
+
 public class EpicTask extends Task {
 
 
@@ -15,15 +17,19 @@ public class EpicTask extends Task {
     public EpicTask(String title, String description) {
         super(title, description, Status.NEW);
         this.taskType = TaskType.EPIC;
-        this.startTime = LocalDateTime.MAX;
+       // this.startTime = LocalDateTime.MAX;
+        this.startTime=LocalDateTime.parse(LocalDateTime.MAX.format(formatter), formatter);
         this.duration = Duration.ZERO;
+        this.endTime=this.startTime;
     }
 
     public EpicTask(String title, String description, int id) {
         super(title, description, Status.NEW, id);
         this.taskType = TaskType.EPIC;
-        this.startTime = LocalDateTime.MAX;
+        //String startNewTime = LocalDateTime.MAX.format(formatter);
+        this.startTime=LocalDateTime.parse(LocalDateTime.MAX.format(formatter), formatter);
         this.duration = Duration.ZERO;
+        this.endTime=this.startTime;
     }
 
     public ArrayList<Integer> getSubTasks() {

@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+import org.junit.jupiter.api.Disabled;
 import ru.practicum.yandex.tasktracker.interfaces.*;
 import ru.practicum.yandex.tasktracker.tasks.*;
 
@@ -66,23 +67,22 @@ public class InMemoryTaskManager implements TaskTracker {
         if (priorityList.isEmpty()) {
             priorityList.add(task);
             return true;
-        } else {
-            Iterator<Task> iterator = priorityList.iterator();
-            for (Task current : priorityList) {
-                if ((task.getStartTime().isBefore(current.getEndTime()) &&
-                        task.getStartTime().isAfter(current.getStartTime())) ||
-                        (task.getEndTime().isBefore(current.getEndTime()) &&
-                                task.getEndTime().isAfter(current.getStartTime())) ||
-                        (task.getStartTime().isBefore(current.getStartTime()) &&
-                                task.getEndTime().isAfter(current.getEndTime()))
-                ) {
-                    System.out.println("Current task start earlier then last task end");
-                    return false;
-                }
-            }
-            priorityList.add(task);
-            return true;
         }
+        for (Task current : priorityList) {
+            if ((task.getStartTime().isBefore(current.getEndTime()) &&
+                    task.getStartTime().isAfter(current.getStartTime())) ||
+                    (task.getEndTime().isBefore(current.getEndTime()) &&
+                            task.getEndTime().isAfter(current.getStartTime())) ||
+                    (task.getStartTime().isBefore(current.getStartTime()) &&
+                            task.getEndTime().isAfter(current.getEndTime()))
+            ) {
+                System.out.println("Current task start earlier then last task end");
+                return false;
+            }
+        }
+        priorityList.add(task);
+        return true;
+
     }
 
     @Override
@@ -101,7 +101,7 @@ public class InMemoryTaskManager implements TaskTracker {
                 epics.put(task.getId(), (EpicTask) task);
                 break;
             case SUB:
-                if (checkAndAddList((SubTask) task)) {
+                if (checkAndAddList(task)) {
                     subs.put(task.getId(), (SubTask) task);
                     if (checkExistence((subs.get(task.getId()).getEpicId())) == TaskType.EPIC) {
                         EpicTask epic = epics.get(subs.get(task.getId()).getEpicId());
@@ -111,7 +111,7 @@ public class InMemoryTaskManager implements TaskTracker {
                     } else {
                         subs.remove(task.getId());
                     }
-                } else return;
+                }
         }
     }
 
@@ -255,7 +255,7 @@ public class InMemoryTaskManager implements TaskTracker {
     }
 
     @Override
-    public List<Task> GiveEachOneTask() {
+    public List<Task> getEachOneTask() {
         List<Task> allTasks = new ArrayList<Task>();
 
         allTasks.addAll(tasks.values());
@@ -362,6 +362,11 @@ public class InMemoryTaskManager implements TaskTracker {
 
     }
 
+    @Disabled
+    @Override
+    public void load() {
+    }
+
     public static <K, V> boolean equalMaps(HashMap<K, V> m1, HashMap<K, V> m2) {
         if (m1.size() != m2.size()) return false;
         for (K key : m1.keySet())
@@ -370,7 +375,7 @@ public class InMemoryTaskManager implements TaskTracker {
         return true;
     }
 
-    private void updateEpicTiming(EpicTask epic) {
+    void updateEpicTiming(EpicTask epic) {
         if (epic.getSubTasks().isEmpty()) {
             System.out.println("Список подзадач пуст!");
             return;

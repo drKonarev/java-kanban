@@ -43,7 +43,7 @@ public class KVServer {
                     return;
                 }
 
-                if (data.containsKey(key)) {
+                if (!data.containsKey(key)) {
                     System.out.println("Не могу достать данные для ключа '" + key + "', данные отсутствуют.");
                     h.sendResponseHeaders(404, 0);
                     return;

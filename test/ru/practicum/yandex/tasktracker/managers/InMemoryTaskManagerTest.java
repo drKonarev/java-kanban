@@ -19,6 +19,7 @@ class InMemoryTaskManagerTest extends TaskManagerTest {
 @BeforeEach
 void before(){
     manager = new InMemoryTaskManager();
+    setup(manager);
 }
     @Test
     void testPriorityList() {

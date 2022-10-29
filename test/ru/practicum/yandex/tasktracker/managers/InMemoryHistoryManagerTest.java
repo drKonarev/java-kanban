@@ -19,12 +19,6 @@ import static ru.practicum.yandex.tasktracker.tasks.Task.Status.NEW;
 class InMemoryHistoryManagerTest {
     InMemoryHistoryManager manager = (InMemoryHistoryManager) Managers.getDefaultHistory();
 
-    /*EpicTask epic = new EpicTask("epic", "epic", 1);
-    manager.add(epic);
-    SubTask sub = new SubTask("sub", "sub", NEW, 1, 2, "16. 10. 2022; 12:00", 60);
-    manager.add(sub);
-    Task  task = new Task("task", "task", DONE, 3, "15. 10. 2022; 12:00", 60);
-    manager.add(task);*/
     @Test
     void emptyStoryAdd() {
         EpicTask epic = new EpicTask("epic", "epic", 1);
